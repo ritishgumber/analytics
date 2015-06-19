@@ -1,13 +1,14 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var multer =require('multer');
+global.isDevelopment = process.env.PORT ? false:true;
 global.q = require('q');
 global.keys = require('./config/keys.js')();
 global.app = express();
 global.cassandra = require('cassandra-driver');
 //Why this line
 var http = require('http').Server(global.app);
-
+app.set('port', process.env.PORT || 5555);
 global.app.use('/',express.static(__dirname + '/interface'));
 global.app.use(multer({
     dest: './uploads/'
@@ -31,7 +32,7 @@ function cassandraConnect(){
     });
 }
 
-http.listen(5555, function() {
+http.listen(app.get('port'), function() {
     console.log('Starting Server');
     attachAPI();
     attachServices();
