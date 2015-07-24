@@ -24,7 +24,6 @@ module.exports = function(){
             global.cassandraClient.execute(query, params, {prepare: true}, function (err, result) {
                 if (!err) {
                     console.log(result);
-
                     deferred.resolve("success");
                 } else {
                     console.log(err);

@@ -3,22 +3,26 @@ module.exports = function() {
     //Api to store Data from Data Services
     global.app.post('/store',function(req,res){
         var id = global.cassandra.types.TimeUuid.now();
-        var method = req.body.method;
-        var time = new Date().getTime();
-        var appId = req.body.appId;
-        //type is the host or name of the box where the service is running
-        var type = req.body.type;
-        //userid of the apps made by developers not for us, can be used to give customer analytics
-        var userId = req.body.userId;
-        //just to support inequality queries
-        var dummy = "abc";
-        var query = "INSERT into requests (id,method,time,appid,host,userid,dummy) values (?,?,?,?,?,?,?)";
-        var params = [id,method,time,appId,type,userId,dummy];
-        record(query,params,1);
-        query = "update counter set value = value +1 where name = ?";
-        params = ["apiCount"];
-        record(query,params,1);
-
+        if(req.body.method) {
+            var method = req.body.method;
+            var time = new Date().getTime();
+            var appId = req.body.appId;
+            //type is the host or name of the box where the service is running
+            var type = req.body.type;
+            //userid of the apps made by developers not for us, can be used to give customer analytics
+            var userId = req.body.userId;
+            //just to support inequality queries
+            var dummy = "abc";
+            var query = "INSERT into requests (id,method,time,appid,host,userid,dummy) values (?,?,?,?,?,?,?)";
+            var params = [id,method,time,appId,type,userId,dummy];
+            record(query,params,1);
+            query = "update counter set value = value +1 where name = ?";
+            params = ["apiCount"];
+            record(query,params,1);
+            res.status(200).send("Success");
+        }else{
+            res.status(400).send("Unknown Request");
+        }
     });
 
 

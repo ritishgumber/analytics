@@ -5,3 +5,4 @@ module.exports = function(){
         dummy: 'abc'
     };
 };
+
