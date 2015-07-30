@@ -60,8 +60,9 @@ module.exports = function() {
 
 // Api to get 10 Days Active APP Count
     global.app.post('/apiActiveApps',function(req,res){
-        var currTime = new Date().getTime()-(24*60*60*1000);
+        var currTime = new Date().getTime()-(50*60*60*1000);
         var query = "select date,activeApps from activeApps where date > ? and dummy = ? ALLOW FILTERING";
+        //var query = "select date,activeApps from activeApps";
         var params = [currTime,global.keys.dummy];
         global.analytics.document.find(query,params).then(function(result){
             result = result.rows;

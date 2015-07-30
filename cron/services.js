@@ -34,7 +34,7 @@ module.exports = function(){
             var markedHosts = [];
             var activeApps = 0;
             for (var i=0;i<data.length;i++){
-                if(markedApps.indexOf(data[i].appid) === -1 && markedHosts.indexOf(data[i].host)=== -1){
+                if(markedApps.indexOf(data[i].appid) === -1 || markedHosts.indexOf(data[i].host)=== -1){
                     markedApps.push(data[i].appid);
                     markedHosts.push(data[i].host);
                     activeApps = activeApps + 1;
