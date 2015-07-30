@@ -229,9 +229,13 @@
                 success: function(response){
                     console.log(response);
                     var gid = "cf-gauge-1";
+                    var maxVal = 1000;
+                    do{
+                        maxVal = maxVal * 10;
+                    }while(response[response.length-1].requests > maxVal  );
                     var obj ={
                         minVal:0,
-                        maxVal:1000,
+                        maxVal:maxVal,
                         newVal:response[response.length-1].requests
                     };
                     gaugeUpdate(gid,obj);
