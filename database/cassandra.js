@@ -21,9 +21,7 @@ module.exports = function(){
 
         insert: function (query, params) {
             var deferred = global.q.defer();
-            console.log(params);
-            deferred.resolve(params);
-           /* global.cassandraClient.execute(query, params, {prepare: true}, function (err, result) {
+            global.cassandraClient.execute(query, params, {prepare: true}, function (err, result) {
                 if (!err) {
                     console.log(result);
                     deferred.resolve("success");
@@ -31,7 +29,7 @@ module.exports = function(){
                     console.log(err);
                     deferred.reject(err);
                 }
-            });*/
+            });
             return deferred.promise;
         }
     };
