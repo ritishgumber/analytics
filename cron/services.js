@@ -56,6 +56,7 @@ module.exports = function(){
             var entry = false;
             var markedEntry = [];
             for(var i=0;i<data.length;i++){
+                entry = false;
                 for(var j=0;j<markedEntry.length;j++) {
                     if (markedEntry[j].appid === data[i].appid && markedEntry[j].host === data[i].host) {
                         entry = true;
