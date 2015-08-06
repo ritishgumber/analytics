@@ -43,8 +43,9 @@ module.exports = function() {
     });
 
 // Api to send back 10 Days API Count Data
-    global.app.post('/apiGraph',function(req,res){
-       var currTime = new Date().getTime()-(10*24*60*60*1000);
+    global.app.get('/apiGraph/:days',function(req,res){
+       var days = req.params.days;
+       var currTime = new Date().getTime()-(days*24*60*60*1000);
         var query = "select date,requests from apiPerDay where date > ? and dummy = ? ALLOW FILTERING";
         var params = [currTime,global.keys.dummy];
         global.analytics.document.find(query,params).then(function(result){
@@ -59,10 +60,10 @@ module.exports = function() {
     });
 
 // Api to get 10 Days Active APP Count
-    global.app.post('/apiActiveApps',function(req,res){
-        var currTime = new Date().getTime()-(50*60*60*1000);
+    global.app.get('/apiActiveApps/:days',function(req,res){
+        var days = req.params.days;
+        var currTime = new Date().getTime()-(days*24*60*60*1000);
         var query = "select date,activeApps from activeApps where date > ? and dummy = ? ALLOW FILTERING";
-        //var query = "select date,activeApps from activeApps";
         var params = [currTime,global.keys.dummy];
         global.analytics.document.find(query,params).then(function(result){
             result = result.rows;
@@ -74,8 +75,9 @@ module.exports = function() {
     });
 
 // Api to get 10 Days data for requests received method wise
-    global.app.post('/apiMethodStats',function(req,res){
-        var currTime = new Date().getTime()-(24*60*60*1000);
+    global.app.get('/apiMethodStats/:days',function(req,res){
+        var days = req.params.days;
+        var currTime = new Date().getTime()-(days*24*60*60*1000);
         var query = "select date,requests,method from methodWiseApiCount where date > ? and dummy = ? ALLOW FILTERING";
         var params = [currTime,global.keys.dummy];
         global.analytics.document.find(query,params).then(function(result){
@@ -87,8 +89,9 @@ module.exports = function() {
         });
     });
 
-    global.app.post('/apiAppStats',function(req,res){
-        var currTime = new Date().getTime()-(24*60*60*1000);
+    global.app.get('/apiAppStats/:days',function(req,res){
+        var days = req.params.days;
+        var currTime = new Date().getTime()-(days*24*60*60*1000);
         var query = "select date,appid,host,requests from appWiseApiCount where date > ? and dummy = ? ALLOW FILTERING";
         var params = [currTime,global.keys.dummy];
         global.analytics.document.find(query,params).then(function(result){

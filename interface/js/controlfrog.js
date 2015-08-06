@@ -248,7 +248,7 @@ $(document).ready(function(){
 		*/
 		
 		// Create chart
-		createLineChart($container);
+		//createLineChart($container);
 	});
 	
 }); // end doc ready

@@ -39,38 +39,38 @@
 			<span class="icon-bar"></span>
 		</a>
 		
-		<!--<ul>
+		<ul>
 			<li class="cf-nav-shortcut">
-				<a href="layout-1.html">
+				<a href="index.html">
 					<span class="cf-nav-min">1</span>
-					<span class="cf-nav-max">Layout 1</span>
+					<span class="cf-nav-max">Previous Day Data</span>
 				</a>
 			</li>
 			<li class="cf-nav-shortcut">
-				<a href="layout-2.html">
+				<a href="week.html">
 					<span class="cf-nav-min">2</span>
-					<span class="cf-nav-max">Layout 2</span>
+					<span class="cf-nav-max">Previous Week Data</span>
 				</a>
 			</li>
-			<li class="current cf-nav-shortcut">
-				<a href="index.html" class="current active">
-					<span class="cf-nav-min">3</span>
-					<span class="cf-nav-max">Layout 3</span>
-				</a>
-			</li>
-			<li class="cf-nav-shortcut">
-				<a href="layout-4.html">
-					<span class="cf-nav-min">4</span>
-					<span class="cf-nav-max">Layout 4</span>
-				</a>
-			</li>
-			<li>
-				<a href="#">
-					<span class="cf-nav-min">&bull;</span>				
-					<span class="cf-nav-max">Example with no shortcut</span>
-				</a>
-			</li>
-		</ul>-->
+            <!--	<li class="current cf-nav-shortcut">
+                    <a href="index.html" class="current active">
+                        <span class="cf-nav-min">3</span>
+                        <span class="cf-nav-max">Layout 3</span>
+                    </a>
+                </li>
+                <li class="cf-nav-shortcut">
+                    <a href="layout-4.html">
+                        <span class="cf-nav-min">4</span>
+                        <span class="cf-nav-max">Layout 4</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="cf-nav-min">&bull;</span>
+                        <span class="cf-nav-max">Example with no shortcut</span>
+                    </a>
+                </li>-->
+		</ul>
 	</div>
 	
 	<div class="cf-container cf-nav-active">
@@ -85,8 +85,6 @@
 						<div class="cf-svmc">
 							<div class="metric" id="apiCount">0</div>
 							<div class="change m-green metric-small">
-								<!--<div class="arrow-up"></div>
-								<span class="large">32<span class="small">.45%</span></span>-->
 							</div>
 						</div>
 						<div class="cf-sparkline clearfix">
@@ -118,11 +116,6 @@
 				</div>
 			</div> <!-- //end cf-item -->
 			<div class="col-sm-3 cf-item">
-				<!--
-	Display the time and date
-	For 12hr clock add class 'cf-td-12' to the 'cf-td' div
--->
-
 <header>
 	<p><span></span>Time &amp; date</p>
 </header>
@@ -198,8 +191,9 @@
                 data: {"name":"apiCount"},
                 type: "POST",
                 success: function(response){
+                    var count = addCommas(response);
                     $("#cf-gauge-1-m").text(response);
-                    $("#apiCount").text(response)
+                    $("#apiCount").text(count);
                 },
                 error: function(response){
                     console.log(response);
@@ -218,13 +212,14 @@
             cf_defaultSparkOpts.highlightLineColor = metric;
             cf_defaultSparkOpts.spotColor = '#f8f77d';
             var sparkOptions = cf_defaultSparkOpts;
+            var numberOfDays = 10;
             $.ajax({
-                url: url+"apiGraph",
-                type: "POST",
+                url: url+"apiGraph/"+numberOfDays,
+                type: "GET",
                 success: function(response){
                     console.log(response);
                     var gid = "cf-gauge-1";
-                    var maxVal = 1000;
+                    var maxVal = 100;
                     do{
                         maxVal = maxVal * 10;
                     }while(response[response.length-1].requests > maxVal  );
@@ -247,9 +242,10 @@
         });
 
         $(document).ready(function(){
+            var numberOfDays = 1;
             $.ajax({
-                url: url+"apiAppStats",
-                type: "POST",
+                url: url+"apiAppStats/"+numberOfDays,
+                type: "GET",
                 success: function(response){
                     response.sort(function(a,b){return b.requests-a.requests});
                     console.log(response);
@@ -273,9 +269,10 @@
         });
 
         $(document).ready(function(){
+            var numberOfDays = 2;
             $.ajax({
-                url: url+"apiActiveApps",
-                type: "POST",
+                url: url+"apiActiveApps/"+numberOfDays,
+                type: "GET",
                 success: function(response)
                     {
                         console.log(response);
@@ -309,9 +306,10 @@
         });
 
         $(document).ready(function(){
+            var numberOfDays = 1;
             $.ajax({
-                url: url+"apiMethodStats",
-                type: "POST",
+                url: url+"apiMethodStats/"+numberOfDays,
+                type: "GET",
                 success: function(response)
                 {
                     var pieData = {"storage":0,"search":0,"file":0};
@@ -372,13 +370,14 @@
         });
 
         $(document).ready(function(){
+            var numberOfDays = 1;
             $.ajax({
-                url: url+"apiMethodStats",
-                type: "POST",
+                url: url+"apiMethodStats/"+numberOfDays,
+                type: "GET",
                 success: function(response) {
                     var table = "<tr><th>Name</th><th>Requests</th></tr>";
                     for(var i=0;i<response.length;i++){
-                        table = table + "<tr><td>"+response[i].method+"</td><td>"+response[i].requests+"</td></tr>";
+                        table = table + "<tr><td>"+response[i].method.toUpperCase()+"</td><td>"+addCommas(response[i].requests)+"</td></tr>";
                     }
                     $("#svp-1").append(table);
                 },

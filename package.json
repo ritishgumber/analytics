@@ -6,6 +6,7 @@
   "dependencies": {
     "body-parser": "^1.13.1",
     "cassandra-driver": "^2.1.0",
+    "cors": "^2.7.1",
     "cron": "^1.0.9",
     "express": "^4.12.4",
     "multer": "^0.1.8",
