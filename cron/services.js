@@ -6,7 +6,7 @@ module.exports = function(){
             var deferred = global.q.defer();
             var currDate = new Date().getTime();
             var prevDate = currDate - 24 * 60 * 60 * 1000;
-            var query = "select * from requests where time > ? and time < ? and dummy = ? ALLOW FILTERING";
+            var query = "select * from requests where time > ? and time < ? and dummy = ? LIMIT 500000 ALLOW FILTERING";
             var params = [prevDate, currDate, global.keys.dummy];
             global.analytics.document.find(query, params).then(function (result) {
                 deferred.resolve(result.rows);
