@@ -6,7 +6,7 @@ module.exports = function(){
 
         find: function (query, params) {
             var deferred = global.q.defer();
-            global.cassandraClient.execute(query, params, {prepare: true, fetchSize : 50000}, function (err, result) {
+            global.cassandraClient.execute(query, params, {prepare: true, fetchSize: 20000}, function (err, result) {
                 if (!err) {
                     console.log(result);
                     deferred.resolve(result);

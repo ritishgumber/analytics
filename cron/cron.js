@@ -1,5 +1,5 @@
 var CronJob = require('cron').CronJob;
-var job= new CronJob('20 20 20 * * *', function(){
+var job= new CronJob('00 40 08 * * *', function(){
         console.log('yes it began');
         global.cronServices.document.getRecords().then(function(data){
             runCronJob(data);
