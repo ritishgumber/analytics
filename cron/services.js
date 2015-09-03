@@ -9,7 +9,6 @@ module.exports = function(){
             var query = "select * from requests where time > ? and time < ? and dummy = ? ALLOW FILTERING";
             var params = [prevDate, currDate, global.keys.dummy];
             global.analytics.document.find(query, params).then(function (result) {
-
                 deferred.resolve(result.rows);
             }, function (err) {
                 deferred.reject(err);
