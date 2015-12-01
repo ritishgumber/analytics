@@ -5,10 +5,10 @@
   "main": "server.js",
   "dependencies": {
     "body-parser": "^1.13.1",
-    "cassandra-driver": "^2.1.0",
     "cors": "^2.7.1",
     "cron": "^1.0.9",
     "express": "^4.12.4",
+    "mongodb": "^2.0.49",
     "multer": "^0.1.8",
     "q": "^1.4.1"
   },

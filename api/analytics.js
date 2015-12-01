@@ -1,119 +1,96 @@
 module.exports = function() {
 
-    //Api to store Data from Data Services
-    global.app.post('/store',function(req,res){
-        var id = global.cassandra.types.TimeUuid.now();
-        if(req.body.method) {
-            var method = req.body.method;
-            var time = new Date().getTime();
+    //Save the API request to the database.
+    global.app.post('/api/store',function(req,res){
+        if(_validate(req,res)){
+            var category = req.body.category;
+            var subCategory = req.body.subCategory;
             var appId = req.body.appId;
-            //type is the host or name of the box where the service is running
-            var type = req.body.type;
-            //userid of the apps made by developers not for us, can be used to give customer analytics
-            var userId = req.body.userId;
-            //just to support inequality queries
-            var dummy = "abc";
-            var query = "INSERT into requests (id,method,time,appid,host,userid,dummy) values (?,?,?,?,?,?,?)";
-            var params = [id,method,time,appId,type,userId,dummy];
-            record(query,params,1);
-            query = "update counter set value = value +1 where name = ?";
-            params = ["apiCount"];
-            record(query,params,1);
-            res.status(200).send("Success");
-        }else{
-            res.status(400).send("Unknown Request");
+            var host = req.body.host;
+            global.analyticsService.store(host,appId, category, subCategory);
+            res.status(200).json({status : "success"});
         }
     });
-
-
-
-// For querying on Counter table just pass in the body the name of counter which is required
-
-    global.app.post('/count',function (req,res) {
-        var name = req.body.name;
-        var query = "select * from counter where name = ?";
-        var params =[];
-        params.push(name);
-        global.analytics.document.find(query,params).then(function(result){
-            console.log(result.rows[0].value);
-            res.status(200).send(result.rows[0].value);
-        },function(err){
-            res.status(400).send(err);
+    
+    //Total API Count
+    global.app.post('/api/count',function(req,res){
+        var category = req.body.category;
+        var subCategory = req.body.subCategory;
+        var appId = req.body.appId;
+        var host = req.body.host;
+        var fromTime = req.body.fromTime;
+        var toTime = req.body.toTime;
+        global.analyticsService.totalApiCount(host, appId, category, subCategory, fromTime, toTime).then(function(result){
+            res.status(200).json({count : result});
+        }, function(error){
+            res.status(500).send(error);
         });
     });
-
-// Api to send back 10 Days API Count Data
-    global.app.get('/apiGraph/:days',function(req,res){
-       var days = req.params.days;
-       var currTime = new Date().getTime()-(days*24*60*60*1000);
-        var query = "select date,requests from apiPerDay where date > ? and dummy = ? ALLOW FILTERING";
-        var params = [currTime,global.keys.dummy];
-        global.analytics.document.find(query,params).then(function(result){
-            result = result.rows;
-            result.sort(function(a,b){return a.date- b.date;});
-            console.log(result);
-            res.status(200).send(result);
-        },function(err){
-            res.status(400).send(err);
-        });
-
+    
+    //Total Active API count
+    global.app.post('/app/active/count',function(req,res){
+            var fromTime = req.body.fromTime;
+            var toTime = req.body.toTime;
+            global.analyticsService.activeAppCount(fromTime, toTime).then(function(result){
+                res.status(200).json({count : result});
+            }, function(error){
+                res.status(500).send(error);
+            });
     });
-
-// Api to get 10 Days Active APP Count
-    global.app.get('/apiActiveApps/:days',function(req,res){
-        var days = req.params.days;
-        var currTime = new Date().getTime()-(days*24*60*60*1000);
-        var query = "select date,activeApps from activeApps where date > ? and dummy = ? ALLOW FILTERING";
-        var params = [currTime,global.keys.dummy];
-        global.analytics.document.find(query,params).then(function(result){
-            result = result.rows;
-            result.sort(function(a,b){return a.date- b.date;});
-            res.status(200).send(result);
-        },function(err){
-            res.status(400).send(err);
-        });
+    
+    
+    //Get apps which are active.
+    global.app.post('/app/active',function(req,res){
+       
+            var fromTime = req.body.fromTime;
+            var toTime = req.body.toTime;
+            var limit = req.body.limit;
+            var skip = req.body.skip;
+            global.analyticsService.activeAppWithAPICount(fromTime, toTime, limit, skip).then(function(result){
+                res.status(200).json(result);
+            }, function(error){
+                res.status(500).send(error);
+            });
+        
     });
-
-// Api to get 10 Days data for requests received method wise
-    global.app.get('/apiMethodStats/:days',function(req,res){
-        var days = req.params.days;
-        var currTime = new Date().getTime()-(days*24*60*60*1000);
-        var query = "select date,requests,method from methodWiseApiCount where date > ? and dummy = ? ALLOW FILTERING";
-        var params = [currTime,global.keys.dummy];
-        global.analytics.document.find(query,params).then(function(result){
-            result = result.rows;
-            result.sort(function(a,b){return a.date- b.date;});
-            res.status(200).send(result);
-        },function(err){
-            res.status(400).send(err);
-        });
+    
+    //Get apps which are active.
+    global.app.post('/category/api',function(req,res){
+       
+            var fromTime = req.body.fromTime;
+            var toTime = req.body.toTime; 
+            global.analyticsService.categoryWithApiCount(fromTime, toTime).then(function(result){
+                res.status(200).json(result);
+            }, function(error){
+                res.status(500).send(error);
+            });
+        
     });
+    
 
-    global.app.get('/apiAppStats/:days',function(req,res){
-        var days = req.params.days;
-        var currTime = new Date().getTime()-(days*24*60*60*1000);
-        var query = "select date,appid,host,requests from appWiseApiCount where date > ? and dummy = ? ALLOW FILTERING";
-        var params = [currTime,global.keys.dummy];
-        global.analytics.document.find(query,params).then(function(result){
-            result = result.rows;
-            result.sort(function(a,b){return a.date- b.date;});
-            res.status(200).send(result);
-        },function(err){
-            res.status(400).send(err);
-        });
-    });
-
-
+    function _validate(req,res){
+        if(!req.body.category){
+            res.status(400).send("Category is required.");
+            return false;
+        }
+        if(!req.body.appId){
+            res.status(400).send("AppID is required.");
+            return false;
+        }
+        if(!req.body.host){
+            res.status(400).send("Host is required.");
+            return false;
+        }
+        if(!req.body.key){
+            res.status(400).send("Key is required.");
+            return false;
+        }
+        
+        if(req.body.key !== global.keys.authenticationKey){
+            res.status(401).send("Unauthorized");
+            return false;
+        }
+        
+        return true;
+    }
 };
-
-function record(query,params,count){
-    global.analytics.document.insert(query,params).then(function(response){
-        if(response === "success")
-            console.log("Data Stored");
-    },function(err) {
-        if(count<3) {
-            count = count+1;
-            record(query,params,count);
-        }
-    });
-}
