@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
-    <title>CB Metrics</title>
+    <title>CloudBoost Admin Analytics</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href="../css/bootstrap.css" rel="stylesheet">
@@ -228,7 +228,7 @@
                         },
                 type: "POST",
                 success: function(response){
-                    var table = "<tr><th>Name</th><th>Requests</th></tr>";
+                    var table = "<tr><th><b>NAME</b></th><th><b>REQUESTS</b></th></tr>";
                     for(var i=0;i<response.length;i++){
                         table = table + "<tr><td>"+response[i].category.toUpperCase()+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>"+addCommas(response[i].apiCount)+"</td></tr>";
                     }
