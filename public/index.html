@@ -255,7 +255,7 @@
                 type: "POST",
                 success: function(response){
                     var count = response.count;
-                    $("#lastWeekAPI").text(count);
+                    $("#lastWeekAPI").text(addCommas(count));
                     
                     //get previous week api count to calculate growth rate. 
                     var twoWeeksAgo = new Date(aWeekAgo);
@@ -307,7 +307,7 @@
                 type: "POST",
                 success: function(response){
                     var count = response.count;
-                    $("#activeApps").text(count);
+                    $("#activeApps").text(addCommas(count));
                     
                     //get previous week api count to calculate growth rate. 
                     var twoWeeksAgo = new Date(aWeekAgo);
