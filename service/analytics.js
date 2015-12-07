@@ -1,6 +1,6 @@
 module.exports = {
 
-	store : function(host, appId, category, subCategory){
+	store : function(host, appId, category, subCategory,sdk){
         
 		var deferred= q.defer();
         
@@ -11,7 +11,8 @@ module.exports = {
           appId : appId, 
           category : category, 
           subCategory : subCategory,
-          timestamp : new Date().getTime()
+          timestamp : new Date().getTime(),
+          sdk : sdk
         };
         
         collection.save(document,function(err,doc){
@@ -28,7 +29,7 @@ module.exports = {
         return deferred.promise;
 	},
     
-    totalApiCount : function(host, appId, category, subCategory, fromTime, toTime){
+    totalApiCount : function(host, appId, category, subCategory, fromTime, toTime,sdk){
         
 		var deferred= q.defer();
         
@@ -44,6 +45,9 @@ module.exports = {
             query.category = category;
         if(subCategory)
             query.subCategory = subCategory;
+
+        if(sdk)
+            query.sdk = sdk;
             
         if(fromTime || toTime){
             
@@ -72,7 +76,7 @@ module.exports = {
         return deferred.promise;
 	},
     
-    activeAppWithAPICount : function(fromTime, toTime, limit, skip){
+    activeAppWithAPICount : function(fromTime, toTime, limit, skip, sdk){
         
         var deferred= q.defer();
         
@@ -81,7 +85,7 @@ module.exports = {
         var pipeline = [];
         
         //add filters. 
-        if(fromTime || toTime){
+        if(fromTime || toTime || sdk){
             var query = {};
             query.timestamp = {};
             if(fromTime){
@@ -92,6 +96,8 @@ module.exports = {
                 query.timestamp.$lt = Number(toTime);
             }
             
+            if(sdk)
+                query.sdk = sdk;
             pipeline.push({$match:query});
         }
         
@@ -142,7 +148,7 @@ module.exports = {
         return deferred.promise;
 	},
     
-    activeAppCount : function(fromTime, toTime){
+    activeAppCount : function(fromTime, toTime,sdk){
         
         var deferred= q.defer();
         
@@ -150,7 +156,7 @@ module.exports = {
         
         //add filters. 
         var query = {};
-        if(fromTime || toTime){
+        if(fromTime || toTime || sdk){
             
             query.timestamp = {};
             
@@ -161,6 +167,9 @@ module.exports = {
             if(toTime){
                 query.timestamp.$lt = Number(toTime);
             }
+
+             if(sdk)
+                query.sdk = sdk;
         }
         
         collection.distinct("appId", query, function(err,docs){
@@ -176,8 +185,66 @@ module.exports = {
         
         return deferred.promise;
 	},
+
+    funnelAppCount : function(fromTime, toTime,apiCount,sdk){
+        
+        var deferred= q.defer();
+        
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.apiNamespace);
+        
+        var pipeline = [];
+
+        //add filters. 
+        var query = {};
+        if(fromTime || toTime || sdk){
+            
+            query.timestamp = {};
+            
+            if(fromTime){
+                query.timestamp.$gt = Number(fromTime);
+            }
+            
+            if(toTime){
+                query.timestamp.$lt = Number(toTime);
+            }
+
+            if(sdk)
+               query.sdk = sdk;
+
+            pipeline.push({$match : query});
+        }
+        
+       //group.
+        var group = {
+          $group : {
+                _id : "$appId",
+                apiCount: { $sum: 1}
+            }  
+        };
+        
+        pipeline.push(group);
+        
+       
+        console.log(apiCount);
+
+        pipeline.push({$match : {apiCount :{$gte:apiCount}}});
+        
+      
+        collection.aggregate(pipeline, function(err,docs){
+            if(err) {
+                console.log("Error in counting API");
+                console.log(err);
+                deferred.reject(err);
+            }else{
+                console.log("Documents Retrieved."); 
+                deferred.resolve(docs.length);
+            }
+        });
+        
+        return deferred.promise;
+    },
     
-    categoryWithApiCount : function(fromTime, toTime){
+    categoryWithApiCount : function(fromTime, toTime, sdk){
         
         var deferred= q.defer();
         
@@ -186,7 +253,7 @@ module.exports = {
         var pipeline = [];
         
         //add filters
-        if(fromTime || toTime){
+        if(fromTime || toTime || sdk){
             var query = {};
             query.timestamp = {};
             if(fromTime){
@@ -196,6 +263,9 @@ module.exports = {
             if(toTime){
                 query.timestamp.$lt = Number(toTime);
             }
+
+            if(sdk)
+              query.sdk = sdk;
             
             pipeline.push({$match:query});
         }

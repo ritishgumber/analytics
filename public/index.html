@@ -50,7 +50,6 @@
 	</div>
 	
 	<div class="cf-container cf-nav-active">
-
 		<div class="row">
 			<div class="col-sm-3 cf-item">
 				<header>
@@ -67,36 +66,91 @@
 					</div>
 				</div>
 			</div> <!-- //end cf-item -->
-			<div class="col-sm-3 cf-item">
-				<header>
-					<p><span></span>API Count - Last 7 days.</p>
-				</header>
-				<div class="content">
-					<div class="cf-svmc-sparkline">
-						<div class="cf-svmc">
-							<div class="metric" id="lastWeekAPI">-</div>
-							<div class="change m-green metric-small">
-							</div>
-						</div>
-						
-					</div>
-				</div>
-			</div> <!-- //end cf-item -->
-			<div class="col-sm-3 cf-item">
-<header>
-	<p><span></span>Server Date and Time.</p>
-</header>
-<div class="content">
-	<div class="cf-td">
-	<!-- <div class="cf-td cf-td-12">-->
-		<div class="cf-td-time metric">12:00</div>
-		<div class="cf-td-dd">
-			<p class="cf-td-day metric-small">Monday</p>
-			<p class="cf-td-date metric-small">1st October, 2013</p>
-		</div>
-	</div>
-</div>
-			</div> <!-- //end cf-item -->
+
+            <div class="col-sm-3 cf-item">
+                <header>
+                    <p><span></span>API Count - Last 7 days.</p>
+                </header>
+                <div class="content">
+                    <div class="cf-svmc-sparkline">
+                        <div class="cf-svmc">
+                            <div class="metric" id="lastWeekAPI">-</div>
+                            <div class="change m-green metric-small">
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div> <!-- //end cf-item -->
+                <div class="col-sm-3 cf-item">
+                <header>
+                    <p><span></span>API GROWTH RATE - LAST WEEK</p>
+                </header>
+                <div class="content">
+                    <div class="cf-svmc-sparkline">
+                        <div class="cf-svmc">
+                            <div class="metric" id="apiGrowthRate">-</div>
+                            <div class="change m-green metric-small">
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div> <!-- //end cf-item -->
+            <div class="col-sm-3 cf-item">
+                <header>
+                    <p><span></span>Method Wise Stats Last Week</p>
+                </header>
+                <div class="content cf-svp clearfix" id="svp-1">
+                </div>
+            </div>
+           
+        </div>
+        <div class="row">
+            <div class="col-sm-3 cf-item">
+                <header>
+                    <p><span></span>TOTAL COMPLETED FUNNEL APP COUNT</p>
+                </header>
+                <div class="content">
+                    <div class="cf-svmc">
+                        <div class="metric" id="funnelCount">-</div>
+                    </div>
+                </div>
+            </div> <!-- //end cf-item -->
+            <div class="col-sm-3 cf-item">
+                <header>
+                    <p><span></span>LAST WEEK FUNNEL APP COUNT</p>
+                </header>
+                <div class="content">
+                    <div class="cf-svmc">
+                        <div class="metric" id="lastWeekFunnelCount">-</div>
+                    </div>
+                </div>
+            </div> <!-- //end cf-item -->
+            <div class="col-sm-3 cf-item">
+                <header>
+                    <p><span></span>LAST WEEK FUNNEL APPS GROWTH RATE</p>
+                </header>
+                <div class="content">
+                    <div class="cf-svmc-sparkline">
+                        <div class="cf-svmc">
+                            <div class="metric" id="funnelGrowthRate">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div> <!-- //end row -->
+        <div class="row">
+            <div class="col-sm-3 cf-item">
+                <header>
+                    <p><span></span>TOTAL APPS</p>
+                </header>
+                <div class="content">
+                    <div class="cf-svmc">
+                        <div class="metric" id="totalApps">-</div>
+                    </div>
+                </div>
+            </div> <!-- //end cf-item -->
 			<div class="col-sm-3 cf-item">
 				<header>
 					<p><span></span>Active Apps last week.</p>
@@ -107,62 +161,55 @@
 					</div>
 				</div>
 			</div> <!-- //end cf-item -->
+            <div class="col-sm-3 cf-item">
+                <header>
+                    <p><span></span>ACTIVE APPS GROWTH RATE - LAST WEEK</p>
+                </header>
+                <div class="content">
+                    <div class="cf-svmc-sparkline">
+                        <div class="cf-svmc">
+                            <div class="metric" id="appGrowthRate">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 cf-item">
+                <header>
+                    <p><span></span>Top Active Apps</p>
+                </header>
+                <div class="content">
+                    <div id="cf-funnel-1" class="cf-funnel"></div>
+                </div>
+            </div> <!-- //end cf-item -->
+            
 		</div> <!-- //end row -->
 	
-		<div class="row">
-			<div class="col-sm-3 cf-item">
-				<header>
-					<p><span></span>API GROWTH RATE - LAST WEEK</p>
-				</header>
-				<div class="content">
-					<div class="cf-svmc-sparkline">
-						<div class="cf-svmc">
-							<div class="metric" id="apiGrowthRate">-</div>
-							<div class="change m-green metric-small">
-							</div>
-						</div>
-						
-					</div>
-				</div>
-			</div> <!-- //end cf-item -->
-			<div class="col-sm-3 cf-item">
-				<header>
-					<p><span></span>ACTIVE APPS GROWTH RATE - LAST WEEK</p>
-				</header>
-				<div class="content">
-					<div class="cf-svmc-sparkline">
-						<div class="cf-svmc">
-							<div class="metric" id="appGrowthRate">-</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			<div class="col-sm-3 cf-item">
-				<header>
-					<p><span></span>Top Active Apps</p>
-				</header>
-                <div class="content">
-					<div id="cf-funnel-1" class="cf-funnel"></div>
-				</div>
-			</div> <!-- //end cf-item -->
-			<div class="col-sm-3 cf-item">
-				<header>
-					<p><span></span>Method Wise Stats</p>
-				</header>
-				<div class="content cf-svp clearfix" id="svp-1">
-				</div>
-			</div>
-		</div>
+		
 	</div> <!-- //end container -->
 
     <script>
+
+    //This is the fucntion to get querysting, 
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
         //load total API count.
         $(document).ready(function(){
             var apiCount = 0;
-            
+
+            var data = {};
+
+            var sdk = getParameterByName('sdk');
+
+            if(sdk)
+                data.sdk = sdk;
+
             $.ajax({
                 url: url+"api/count",
-                data: {},
+                data: data,
                 type: "POST",
                 success: function(response){
                     var count = response.count;
@@ -181,12 +228,19 @@
             var aWeekAgo = new Date();
             var numberOfDays = 7;
             aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
+
+            var data = {"fromTime":aWeekAgo.getTime(),
+                       "toTime" : new Date().getTime(),
+                        "limit" : 5};
+
+            var sdk = getParameterByName('sdk');
+
+            if(sdk)
+                data.sdk = sdk;
             
             $.ajax({
                 url: url+"app/active",
-                data: {"fromTime":aWeekAgo.getTime(),
-                       "toTime" : new Date().getTime(),
-                        "limit" : 5},
+                data: data,
                 type: "POST",
                 success: function(response){
                    var text ="";
@@ -212,20 +266,76 @@
                 }
             });
         });
+
+//Get top active apps with API count.
+        $(document).ready(function(){
+
+            var data = {};
+
+            var sdk = getParameterByName('sdk');
+
+            if(sdk)
+                data.sdk = sdk;
+
+            $.ajax({
+                url: url+"app/active/count",
+                data: data,
+                type: "POST",
+                success: function(response){
+                    var count = response.count;
+                    $("#totalApps").text(addCommas(count));
+                },
+                error: function(response){
+                    console.log(response);
+                }
+            });
+        });
+
+        //Get top active apps with API count.
+        $(document).ready(function(){
+
+            var data = {};
+
+            var sdk = getParameterByName('sdk');
+
+            if(sdk)
+                data.sdk = sdk;
+
+            $.ajax({
+                url: url+"app/funnel/count",
+                data: data,
+                type: "POST",
+                success: function(response){
+                    var count = response.count;
+                    $("#funnelCount").text(addCommas(count));
+                },
+                error: function(response){
+                    console.log(response);
+                }
+            });
+        });
+        
         
         //Get category count.
         $(document).ready(function(){
             var apiCount = 0;
-            
-            var aWeekAgo = new Date();
+
+             var aWeekAgo = new Date();
             var numberOfDays = 7;
             aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
             
+           var data = {"fromTime":aWeekAgo.getTime(),
+                       "toTime" : new Date().getTime(),
+                        "limit" : 5};
+
+            var sdk = getParameterByName('sdk');
+
+            if(sdk)
+                data.sdk = sdk;
+            
             $.ajax({
                 url: url+"category/api",
-                data: {"fromTime":aWeekAgo.getTime(),
-                       "toTime" : new Date().getTime(),
-                        },
+                data: data,
                 type: "POST",
                 success: function(response){
                     var table = "<tr><th><b>NAME</b></th><th><b>REQUESTS</b></th></tr>";
@@ -247,11 +357,19 @@
             var aWeekAgo = new Date();
             var numberOfDays = 7;
             aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
+
+           var data = {"fromTime":aWeekAgo.getTime(),
+                       "toTime" : new Date().getTime(),
+                        "limit" : 5};
+
+            var sdk = getParameterByName('sdk');
+
+            if(sdk)
+                data.sdk = sdk;
             
             $.ajax({
                 url: url+"api/count",
-                data: {"fromTime":aWeekAgo.getTime(),
-                        "toTime" : new Date().getTime()},
+                data: data,
                 type: "POST",
                 success: function(response){
                     var count = response.count;
@@ -262,10 +380,17 @@
                     var numberOfDays = 7;
                     twoWeeksAgo.setDate(twoWeeksAgo.getDate() - numberOfDays); 
                     
+                    var data = {"fromTime":twoWeeksAgo.getTime(),
+                                "toTime" : aWeekAgo.getTime()};
+
+                    var sdk = getParameterByName('sdk');
+
+                    if(sdk)
+                        data.sdk = sdk;          
+
                     $.ajax({
                         url: url+"api/count",
-                        data: {"fromTime":twoWeeksAgo.getTime(),
-                                "toTime" : aWeekAgo.getTime()},
+                        data: data,
                         type: "POST",
                         success: function(response){
                            var lastWeek = response.count; 
@@ -291,6 +416,72 @@
             });
         });
 
+        //get last week API Count. 
+        $(document).ready(function(){
+            var apiCount = 0;
+            
+            var aWeekAgo = new Date();
+            var numberOfDays = 7;
+            aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
+            
+            var data = {"fromTime":aWeekAgo.getTime(),
+                        "toTime" : new Date().getTime()};
+
+             var sdk = getParameterByName('sdk');
+
+            if(sdk)
+                data.sdk = sdk;
+
+            $.ajax({
+                url: url+"app/funnel/count",
+                data: data,
+                type: "POST",
+                success: function(response){
+                    var count = response.count;
+                    $("#lastWeekFunnelCount").text(addCommas(count));
+                    
+                    //get previous week api count to calculate growth rate. 
+                    var twoWeeksAgo = new Date(aWeekAgo);
+                    var numberOfDays = 7;
+                    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - numberOfDays); 
+                    
+
+                    var data = {"fromTime":twoWeeksAgo.getTime(),
+                                "toTime" : aWeekAgo.getTime()};
+
+                     var sdk = getParameterByName('sdk');
+
+                    if(sdk)
+                        data.sdk = sdk;
+
+                    $.ajax({
+                        url: url+"app/funnel/count",
+                        data: data,
+                        type: "POST",
+                        success: function(response){
+                           var lastWeek = response.count; 
+                           var thisWeek = count;
+                           
+                           //calculate growth rate. 
+                           var growth = ((thisWeek - lastWeek)/lastWeek)*100;
+                           
+                           //round to 1 decimal place. 
+                           var finalNumber = Math.round( growth * 10) / 10;
+                           
+                           $("#funnelGrowthRate").text(finalNumber+"%");
+                        },
+                        error: function(response){
+                            console.log(response);
+                        }
+                    });
+                    
+                },
+                error: function(response){
+                    console.log(response);
+                }
+            });
+        });
+
 
         //get last active apps count. 
         $(document).ready(function(){
@@ -300,10 +491,17 @@
             var numberOfDays = 7;
             aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
             
+            var data = {"fromTime":aWeekAgo.getTime(),
+                        "toTime" : new Date().getTime()};
+
+             var sdk = getParameterByName('sdk');
+
+            if(sdk)
+                data.sdk = sdk;
+
             $.ajax({
                 url: url+"app/active/count",
-                data: {"fromTime":aWeekAgo.getTime(),
-                        "toTime" : new Date().getTime()},
+                data: data,
                 type: "POST",
                 success: function(response){
                     var count = response.count;
@@ -314,10 +512,16 @@
                     var numberOfDays = 7;
                     twoWeeksAgo.setDate(twoWeeksAgo.getDate() - numberOfDays); 
                     
+
+                    var data = {"fromTime":twoWeeksAgo.getTime(),
+                                "toTime" : aWeekAgo.getTime()};
+
+                    if(sdk)
+                        data.sdk = sdk;
+
                     $.ajax({
                         url: url+"app/active/count",
-                        data: {"fromTime":twoWeeksAgo.getTime(),
-                                "toTime" : aWeekAgo.getTime()},
+                        data: data,
                         type: "POST",
                         success: function(response){
                            var lastWeek = response.count; 
