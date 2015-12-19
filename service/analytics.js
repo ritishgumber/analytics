@@ -1,3 +1,5 @@
+var priceChart=require('../config/priceChart.js')();
+
 module.exports = {
 
 	store : function(host, appId, category, subCategory,sdk){
@@ -16,14 +18,14 @@ module.exports = {
         };
         
         collection.save(document,function(err,doc){
-                if(err) {
-                    console.log("Error while saving API");
-                    console.log(err);
-                    deferred.reject(err);
-                }else{
-                    console.log('++++ Object Updated +++');
-                    deferred.resolve(doc);
-                }
+            if(err) {
+                console.log("Error while saving API");
+                console.log(err);
+                deferred.reject(err);
+            }else{
+                console.log('++++ Object Updated +++');
+                deferred.resolve(doc);
+            }
         });
         
         return deferred.promise;
@@ -299,6 +301,113 @@ module.exports = {
         });
         
         return deferred.promise;
-	}
+	},
+    statisticsByAppId : function(appId,fromTime,category){
+        
+        var deferred= q.defer();
+        
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.apiNamespace);
+        
+        var pipeline = [];        
+        
+        var query = {};
+        query.appId = appId;
+
+        if(category){
+            query.category = category;
+        }
+        
+        query.timestamp = {}; 
+        if(!fromTime){  
+            //Start from everymonth 1st    
+            var fromTime = new Date();
+            fromTime.setDate(1);
+            fromTime.setHours(0);
+            fromTime.setMinutes(0);
+            fromTime.setSeconds(0);
+            fromTime=new Date(fromTime).getTime();
+        }  
+        query.timestamp.$gt = fromTime;        
+
+        pipeline.push({$match:query});                  
+
+
+        var project1={
+            $project: {
+                "txnTime": {
+                    "$add": [ new Date(0), "$timestamp" ]
+                }
+            }
+        };
+        pipeline.push(project1);
+
+        var project2={
+          "$project": {
+            "day": {
+              "$dateToString": {
+                "format": "%Y-%m-%d",
+                "date": "$txnTime"
+              }
+            }
+          }
+        };
+        pipeline.push(project2);
+
+        var group = {
+            $group : {
+                _id :"$day",                
+                apiCount: { $sum: 1}                
+            }  
+        };        
+        pipeline.push(group);        
+      
+        collection.aggregate(pipeline, function(err,docs){
+            if(err) {
+                console.log("Error in Getting per day count API");
+                console.log(err);                
+                deferred.reject(err);
+            }else if(docs.length>0){
+                deferred.resolve(_prepareResponse(docs));                
+            }else{
+                deferred.resolve(null);
+            }
+        });
+        
+        return deferred.promise;
+    }
        
 };
+
+
+function _prepareResponse(dayCountList,category) {
+    var categoryName=null;
+    var totalCost=0;
+    var totalApiCount=0;
+    for(var i=0;i<dayCountList.length;++i){
+        totalApiCount=totalApiCount+parseInt(dayCountList[i].apiCount)
+    }
+    totalCost=_processPricing(category,totalApiCount);
+
+    categoryName=category;
+    if(!category){
+        categoryName="API";
+    }
+
+    var response={
+        category:categoryName,
+        totalApiCount:totalApiCount,
+        totalCost:totalCost,
+        usage:dayCountList
+    };
+
+    return response;
+}
+
+function _processPricing (category,totalApiCount) {
+    if(!category){      
+        var bucketsCount=Math.ceil(totalApiCount/priceChart.apiRequestBucket);
+        return bucketsCount*priceChart.apiCost;        
+    }
+}
+
+
