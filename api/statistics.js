@@ -6,9 +6,10 @@ module.exports = function() {
         var appId = req.body.appId;
         var fromTime = req.body.fromTime;
         var category = req.body.category;
+        var subCategory = req.body.subCategory;
 
         if(appId){
-            global.analyticsService.statisticsByAppId(appId,fromTime,category).then(function(result){
+            global.analyticsService.statisticsByAppId(appId,fromTime,category,subCategory).then(function(result){
                 res.status(200).json(result);
             }, function(error){
                 res.status(500).send(error);

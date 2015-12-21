@@ -8,6 +8,9 @@ module.exports = {
         
         var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.apiNamespace);
         
+        category=category.trim();
+        subCategory=subCategory.trim();
+
         var document = {
           host : host,
           appId : appId, 
@@ -302,7 +305,7 @@ module.exports = {
         
         return deferred.promise;
 	},
-    statisticsByAppId : function(appId,fromTime,category){
+    statisticsByAppId : function(appId,fromTime,category,subCategory){
         
         var deferred= q.defer();
         
@@ -315,6 +318,9 @@ module.exports = {
 
         if(category){
             query.category = category;
+        }
+        if(subCategory){
+            query.subCategory = subCategory;
         }
         
         query.timestamp = {}; 
@@ -367,7 +373,7 @@ module.exports = {
                 console.log(err);                
                 deferred.reject(err);
             }else if(docs.length>0){
-                deferred.resolve(_prepareResponse(docs));                
+                deferred.resolve(_prepareResponse(docs,category));                
             }else{
                 deferred.resolve(null);
             }
@@ -387,7 +393,7 @@ function _prepareResponse(dayCountList,category) {
         totalApiCount=totalApiCount+parseInt(dayCountList[i].apiCount)
     }
     totalCost=_processPricing(category,totalApiCount);
-
+    
     categoryName=category;
     if(!category){
         categoryName="API";
@@ -404,9 +410,22 @@ function _prepareResponse(dayCountList,category) {
 }
 
 function _processPricing (category,totalApiCount) {
+    //Common API
     if(!category){      
         var bucketsCount=Math.ceil(totalApiCount/priceChart.apiRequestBucket);
         return bucketsCount*priceChart.apiCost;        
+    }
+
+    //Search API
+    if(category=="Object "){      
+        var bucketsCount=Math.ceil(totalApiCount/priceChart.searchRequestBucket);
+        return bucketsCount*priceChart.searchCost;        
+    }
+
+    //Queues API
+    if(category="Object"){      
+        var bucketsCount=Math.ceil(totalApiCount/priceChart.queueRequestBucket);
+        return bucketsCount*priceChart.queueCost;        
     }
 }
 

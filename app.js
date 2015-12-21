@@ -2,15 +2,14 @@ module.exports = function(){
 
 	require('./config/dbConnection.js')();
 	var express = require('express');
-	var bodyParser = require('body-parser');
-	var cors = require('cors');	
+	var bodyParser = require('body-parser');		
 
 	global.app = express();
-	global.app.use(cors());
 
 	global.app.use('/',express.static(__dirname + '/public'));
 	global.app.use(bodyParser.urlencoded({extended:true}));
 	global.app.use(bodyParser.json());
+	require('./config/cors.js')(); //cors!
 
 	//Routes
 	function attachAPI(){
