@@ -32,7 +32,8 @@ module.exports = function(){
 	function attachAPI(){
 	    try{
 	       require('./api/analytics')();
-	       require('./api/userAnalytics')();	       
+	       require('./api/userApiAnalytics')();	
+	       require('./api/userStorageAnalytics')();	        
 	    }catch(e){
 	       console.log(e);
 	    }
@@ -43,7 +44,8 @@ module.exports = function(){
 		try{
 	       global.analyticsService = require('./service/analyticsService.js');	       
 	       global.twoCheckoutService = require('./service/twoCheckoutService.js');
-	       global.userAnalyticsService = require('./service/userAnalyticsService.js');
+	       global.userApiAnalyticsService = require('./service/userApiAnalyticsService.js');
+	       global.userStorageAnalyticsService = require('./service/userStorageAnalyticsService.js');
 	    }catch(e){
 	       console.log(e);
 	    }	    
@@ -55,18 +57,27 @@ module.exports = function(){
 };
 
 
-function _runUserAnalyticsCronJob(){
-
+function _runUserAnalyticsCronJob(){		
 
 	try {
 		
-		var job = new CronJob('* * * * * *', function() {
+		var UserStorageAnalyticsJob = new CronJob('58 58 23 * * *', function() {
 		  /*
-		   * Runs every weekday (Monday through Friday)
-		   * at 11:30:00 AM. It does not run on Saturday
-		   * or Sunday.
+		   * Runs every day
+		   * at 11:58:58 PM(58 58 23 * * *)		   
 		   */
 		    
+		    global.mongoClient.command({listDatabases: 1},function(err, databaseStatList){
+				if(err) {            
+		            console.log(err);            
+		        }else if(databaseStatList){
+		            
+		            for(var i=0;i<databaseStatList.databases.length;++i){
+		            	console.log(databaseStatList.databases[i]);
+		            	global.userStorageAnalyticsService.addRecord(databaseStatList.databases[i].name,databaseStatList.databases[i].sizeOnDisk);
+		            }                         
+		        }
+			});
 
 		  }, function () {
 		    /* This function is executed when the job stops */
@@ -76,6 +87,6 @@ function _runUserAnalyticsCronJob(){
 		);
 
 	} catch(ex) {
-		console.log("User Analytics cron pattern not valid");
+		console.log("User Storage Analytics cron pattern not valid");
 	}
 }

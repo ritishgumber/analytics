@@ -41,7 +41,7 @@ module.exports = {
         
         var deferred= q.defer();
         
-        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.userAnalyticsNamespace);      
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.userApiAnalyticsNamespace);      
             
         collection.insertOne(saveJson,function(err,doc){
             if(err) {               
@@ -58,7 +58,7 @@ module.exports = {
         
         var deferred= q.defer();
         
-        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.userAnalyticsNamespace);          
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.userApiAnalyticsNamespace);          
 
         var startDay=dateObj;
         startDay.setHours(0,0,0,0); 
@@ -84,7 +84,7 @@ module.exports = {
         
         var deferred= q.defer();
         
-        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.userAnalyticsNamespace);
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.userApiAnalyticsNamespace);
 
         var startDay=dateObj;
         startDay.setHours(0,0,0,0); 
@@ -110,7 +110,7 @@ module.exports = {
         
         var deferred= q.defer();
         
-        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.userAnalyticsNamespace);
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.userApiAnalyticsNamespace);
         
         if(!fromTime){  
             //Start from everymonth 1st    
@@ -120,7 +120,7 @@ module.exports = {
             fromTime=fromTime.getTime();
         }             
       
-        collection.find({appId:appId}).toArray(function(err,docs){
+        collection.find({appId:appId,timeStamp: {$gte: fromTime}}).toArray(function(err,docs){
             if(err) {                               
                 deferred.reject(err);
             }else if(docs && docs.length>0){
@@ -143,8 +143,7 @@ function _prepareResponse(dayCountList) {
         totalApiCount=totalApiCount+parseInt(dayCountList[i].dayApiCount)
     }  
    
-    var response={ 
-        categoryName:"API",             
+    var response={                     
         totalApiCount:totalApiCount,
         usage: dayCountList       
     };

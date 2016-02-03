@@ -27,8 +27,8 @@ module.exports = {
                 console.log('++++ Object Updated +++');
                 deferred.resolve(doc);
 
-                //Update apiAnalytics
-                global.userAnalyticsService.addRecord(host, appId);               
+                //Update UserApiAnalytics
+                global.userApiAnalyticsService.addRecord(host, appId);               
             }
         });
         

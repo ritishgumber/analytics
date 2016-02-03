@@ -4,7 +4,8 @@ module.exports = function(){
        authenticationKey : "109eb359-3d22-4165-9e21-21439637f975",
        dbName : "_Analytics",
        apiNamespace : "API",
-       userAnalyticsNamespace : "userAnalytics"
+       userApiAnalyticsNamespace : "userApiAnalytics",
+       userStorageAnalyticsNamespace : "userStorageAnalytics"
     };
 };
 
