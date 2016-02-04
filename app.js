@@ -23,6 +23,7 @@ module.exports = function(){
 	            //allowing services to run after connecting to mongoDB
 	            attachServices();
    				attachAPI();
+   				_runDefaultFunctions();
     			_runUserAnalyticsCronJob();	
 	        }
 	    })
@@ -32,8 +33,8 @@ module.exports = function(){
 	function attachAPI(){
 	    try{
 	       require('./api/analytics')();
-	       require('./api/userApiAnalytics')();	
-	       require('./api/userStorageAnalytics')();	        
+	       require('./api/userAnalytics')();
+	       require('./api/server')();	              
 	    }catch(e){
 	       console.log(e);
 	    }
@@ -46,6 +47,7 @@ module.exports = function(){
 	       global.twoCheckoutService = require('./service/twoCheckoutService.js');
 	       global.userApiAnalyticsService = require('./service/userApiAnalyticsService.js');
 	       global.userStorageAnalyticsService = require('./service/userStorageAnalyticsService.js');
+	       global.serverService = require('./service/serverService.js');
 	    }catch(e){
 	       console.log(e);
 	    }	    
@@ -56,6 +58,22 @@ module.exports = function(){
  	return app;
 };
 
+function _runDefaultFunctions(){
+
+	global.serverService.getList().then(function(list){
+
+		if(list){
+			global.clusterKeysList={};
+			for(var i=0;i<list.length;++i){			
+				global.clusterKeysList[list[i].secureKey]=1;			
+			}
+		}		
+        
+
+    }, function(error){           
+        console.log("Error in getting cluster keys");
+    });
+}
 
 function _runUserAnalyticsCronJob(){		
 

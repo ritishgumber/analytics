@@ -5,7 +5,8 @@ module.exports = function(){
        dbName : "_Analytics",
        apiNamespace : "API",
        userApiAnalyticsNamespace : "userApiAnalytics",
-       userStorageAnalyticsNamespace : "userStorageAnalytics"
+       userStorageAnalyticsNamespace : "userStorageAnalytics",
+       clustersNamespace : "clusters"
     };
 };
 
