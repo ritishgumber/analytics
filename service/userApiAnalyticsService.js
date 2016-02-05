@@ -9,7 +9,7 @@ module.exports = {
         var deferred= q.defer();
 
 
-        _self.findByDay(appId,new Date()).then(function(doc){         
+        _self.findByDay(host,appId,new Date()).then(function(doc){         
             if(doc){
                 var newDayApiCount=doc.dayApiCount;
                 ++newDayApiCount;
@@ -17,10 +17,10 @@ module.exports = {
                 var updateJson={                    
                     dayApiCount: newDayApiCount                   
                 };
-                return _self.updateByDay(appId,new Date(),updateJson);
+                return _self.updateByDay(host,appId,new Date(),updateJson);
             }else{
                 var docJson={
-                    host:host,
+                    secureKey:host,
                     appId:appId,
                     dayApiCount:1,
                     timeStamp: new Date().getTime()
@@ -53,7 +53,7 @@ module.exports = {
        
         return deferred.promise;
     },
-    findByDay : function(appId,dateObj){
+    findByDay : function(secureKey,appId,dateObj){
         
         
         var deferred= q.defer();
@@ -69,7 +69,7 @@ module.exports = {
         endDay=endDay.getTime();     
 
 
-        collection.findOne({appId:appId, timeStamp: {$gte: startDay, $lt: endDay}      
+        collection.findOne({secureKey:secureKey,appId:appId, timeStamp: {$gte: startDay, $lt: endDay}      
         },function(err,doc){
             if(err) {                
                 deferred.reject(err);
@@ -80,7 +80,7 @@ module.exports = {
         
         return deferred.promise;
     },
-    updateByDay : function(appId,dateObj,newJson){
+    updateByDay : function(secureKey,appId,dateObj,newJson){
         
         var deferred= q.defer();
         
@@ -94,7 +94,7 @@ module.exports = {
         endDay.setHours(23,59,59,0);
         endDay=endDay.getTime(); 
             
-        collection.findOneAndUpdate({appId:appId,timeStamp: {$gte: startDay, $lt: endDay}
+        collection.findOneAndUpdate({secureKey:secureKey,appId:appId,timeStamp: {$gte: startDay, $lt: endDay}
         },{$set:newJson},{upsert: true,returnOriginal:false},function(err,docList){
             if(err) {               
                 deferred.reject(err);
@@ -106,7 +106,7 @@ module.exports = {
         return deferred.promise;
     },
 
-    monthlyAnalyticsByAppId : function(appId,fromTime){
+    monthlyAnalyticsByAppId : function(secureKey,appId,fromTime){
         
         var deferred= q.defer();
         
@@ -120,7 +120,7 @@ module.exports = {
             fromTime=fromTime.getTime();
         }             
       
-        collection.find({appId:appId,timeStamp: {$gte: fromTime}}).toArray(function(err,docs){
+        collection.find({secureKey:secureKey,appId:appId,timeStamp: {$gte: fromTime}}).toArray(function(err,docs){
             if(err) {                               
                 deferred.reject(err);
             }else if(docs && docs.length>0){

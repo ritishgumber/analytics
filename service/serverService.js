@@ -21,7 +21,10 @@ module.exports ={
 
             }else{
                 deferred.resolve({"status":"Okay"});
-            }      
+            }
+            
+            //Add to global clusterkeyObject
+            global.clusterKeysList[secureKey]=1;      
 
         },function(error){
             deferred.reject(error);

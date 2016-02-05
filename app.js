@@ -34,7 +34,8 @@ module.exports = function(){
 	    try{
 	       require('./api/analytics')();
 	       require('./api/userAnalytics')();
-	       require('./api/server')();	              
+	       require('./api/server')();
+	       require('./api/payments')();	              
 	    }catch(e){
 	       console.log(e);
 	    }
@@ -43,11 +44,12 @@ module.exports = function(){
 	//Services
 	function attachServices(){
 		try{
-	       global.analyticsService = require('./service/analyticsService.js');	       
-	       global.twoCheckoutService = require('./service/twoCheckoutService.js');
+	       global.analyticsService = require('./service/analyticsService.js');	      
 	       global.userApiAnalyticsService = require('./service/userApiAnalyticsService.js');
 	       global.userStorageAnalyticsService = require('./service/userStorageAnalyticsService.js');
 	       global.serverService = require('./service/serverService.js');
+	       global.paymentsService = require('./service/paymentsService.js');
+	       global.twoCheckoutService = require('./service/twoCheckoutService.js');
 	    }catch(e){
 	       console.log(e);
 	    }	    
@@ -59,16 +61,16 @@ module.exports = function(){
 };
 
 function _runDefaultFunctions(){
+	global.clusterKeysList={};	
 
 	global.serverService.getList().then(function(list){
 
 		if(list){
-			global.clusterKeysList={};
+
 			for(var i=0;i<list.length;++i){			
 				global.clusterKeysList[list[i].secureKey]=1;			
 			}
-		}		
-        
+		}	        
 
     }, function(error){           
         console.log("Error in getting cluster keys");
@@ -90,8 +92,7 @@ function _runUserAnalyticsCronJob(){
 		            console.log(err);            
 		        }else if(databaseStatList){
 		            
-		            for(var i=0;i<databaseStatList.databases.length;++i){
-		            	console.log(databaseStatList.databases[i]);
+		            for(var i=0;i<databaseStatList.databases.length;++i){		            	
 		            	global.userStorageAnalyticsService.addRecord(databaseStatList.databases[i].name,databaseStatList.databases[i].sizeOnDisk);
 		            }                         
 		        }

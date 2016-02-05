@@ -6,8 +6,8 @@ module.exports = function() {
         var data = req.body || {};
         var appId=req.params.appId;        
 
-        if(data.secureKey){
-	        global.userApiAnalyticsService.monthlyAnalyticsByAppId(appId,null).then(function(result){                
+        if(data.secureKey && global.clusterKeysList[data.secureKey]==1){
+	        global.userApiAnalyticsService.monthlyAnalyticsByAppId(data.secureKey,appId,null).then(function(result){                
 	           return res.status(200).json(result);
 	        }, function(error){           
 	            return res.status(400).send(error);
@@ -24,7 +24,7 @@ module.exports = function() {
         var data = req.body || {}; 
         var appId=req.params.appId;        
 
-        if(data.secureKey){
+        if(data.secureKey && global.clusterKeysList[data.secureKey]==1){
             global.userStorageAnalyticsService.monthlyAnalyticsByAppId(appId,null).then(function(result){
                return res.status(200).json(result);
             }, function(error){           

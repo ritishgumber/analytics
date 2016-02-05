@@ -20,8 +20,21 @@ module.exports = function() {
 
 
    //know server isHosted?
-    global.app.get('/server/isHosted',function(req,res){
+    global.app.post('/server/isHosted',function(req,res){
 
+        var data = req.body || {}; 
+
+        if(data.secureKey){
+
+            if(data.secureKey==global.keys.hostedSecureKey){
+                return res.status(200).send(true);
+            }else{
+                return res.status(200).send(false);
+            }
+
+        }else{
+            return res.send(400, "Bad Request");
+        } 
        
 
     });

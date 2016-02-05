@@ -7,7 +7,7 @@ module.exports ={
 
         var deferred= q.defer();
      
-     	size=(size/1048576);//Convert to MBs
+     	size=(size/1048576);//Convert Bytes to MBs
 
      	var docJson={            
             appId:appId,
