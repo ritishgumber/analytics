@@ -1,28 +1,52 @@
 module.exports = function() {
 
 
-    //Register new server
+    //Create Sale
     global.app.post('/:appId/sale',function(req,res){
 
-    	var data = req.body || {};
-        var appId=req.params.appId;      
-
-        global.clusterKeysList[data.secureKey]=1;
+    	  var data = req.body || {};
+        var appId=req.params.appId;        
 
         if(data.secureKey && global.clusterKeysList[data.secureKey]==1){
             
-            global.paymentsService.createSale(appId,data).then(function(respData) {
-              if (!respData) {               
-                return res.status(400).send('Error : Went wrong not found');
-              }               
-              return res.status(200).json(respData);
+          global.paymentsService.createSale(appId,data).then(function(respData) {
+            if (!respData) {               
+              return res.status(400).send('Error : Something went wrong');
+            }               
+            return res.status(200).json(respData);
 
-            },function(error){              
-              return res.status(400).send(error);
-            });
+          },function(error){              
+            return res.status(400).send(error);
+          });
 
         }else{         
-            return res.status(400).send("Unauthorized");
+          return res.status(400).send("Unauthorized");
+        }
+
+    });
+
+
+    //Cancel(stop recurring)
+    global.app.post('/:appId/cancel',function(req,res){
+
+        var data = req.body || {};
+        var appId=req.params.appId;          
+       
+
+        if(data.secureKey && global.clusterKeysList[data.secureKey]==1){
+            
+          global.paymentsService.stopRecurring(appId,data.userId).then(function(respData) {
+            if (!respData) {               
+              return res.status(400).send('Error : No Document Found!');
+            }               
+            return res.status(200).json(respData);
+
+          },function(error){              
+            return res.status(400).send(error);
+          });
+
+        }else{         
+          return res.status(400).send("Unauthorized");
         }
 
     });

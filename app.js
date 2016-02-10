@@ -50,6 +50,7 @@ module.exports = function(){
 	       global.serverService = require('./service/serverService.js');
 	       global.paymentsService = require('./service/paymentsService.js');
 	       global.twoCheckoutService = require('./service/twoCheckoutService.js');
+	       global.salesService = require('./service/salesService.js');
 	    }catch(e){
 	       console.log(e);
 	    }	    

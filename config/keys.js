@@ -5,14 +5,17 @@ module.exports = function(){
        dbName : "_Analytics",
        hostedSecureKey : "hsygdfshdgfshdsgdhsd",
        twoCheckout : {
-        sellerId:"901307760",
-        privateKey:"4D33B4B4-6DC0-47D1-A642-436CECE51B8F",
+        apiUser:"nawazdhandala",
+        apiPass:"WhiteHouse123",
+        sellerId:"202796222",
+        privateKey:"F4A419F9-32AD-4BD9-B045-022309D78DB4",
         sandbox:true
        },
        apiNamespace : "API",
        userApiAnalyticsNamespace : "userApiAnalytics",
        userStorageAnalyticsNamespace : "userStorageAnalytics",
-       clustersNamespace : "clusters"
+       clustersNamespace : "clusters",
+       salesNamespace : "sales"
     };
 };
 

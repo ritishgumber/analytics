@@ -1,6 +1,10 @@
-var Twocheckout = require('2checkout-node');
+var uuid = require('uuid');
 
-var tco = new Twocheckout({                                         
+
+var Twocheckout = require('2checkout-node');
+var tco = new Twocheckout({
+  apiUser: global.keys.twoCheckout.apiUser,
+  apiPass: global.keys.twoCheckout.apiPass,                                         
   sellerId: global.keys.twoCheckout.sellerId,                                    
   privateKey: global.keys.twoCheckout.privateKey,     
   sandbox: global.keys.twoCheckout.sandbox                                          
@@ -8,47 +12,87 @@ var tco = new Twocheckout({
 
 module.exports = {
 
-     createSale : function(data){
+     createSale : function(data,selectedPlan){
         
         var deferred= q.defer();        
        
-		var params = {
-            "merchantOrderId": "sjd",
+        var merchantOrderId=uuid.v1();
+
+		    var params = {
+            "merchantOrderId": merchantOrderId,
             "token": data.token.toString(),
             "currency": "USD",                                 
             "billingAddr": {
-                "name": "Joe Flagster",
-                "addrLine1": "123 Main Street",
-                "city": "Townsville",
-                "state": "Ohio",
-                "zipCode": "43206",
-                "country": "USA",
-                "email":"battu.network@gmail.com"               
+                "name": data.billingAddr.name,
+                "addrLine1": data.billingAddr.addrLine1,
+                "addrLine2": data.billingAddr.addrLine2,
+                "city":  data.billingAddr.city,
+                "state": data.billingAddr.state,
+                "zipCode": data.billingAddr.zipCode,
+                "country": data.billingAddr.country,
+                "email":data.userEmail               
             },
-            "lineitems":[{
+            "lineItems":[{
               "type":"product",
-              "name":"launchPlan",
+              "name":selectedPlan.planName,
               "quantity":"1",
-              "price":"10.00", 
-              "productId":"launchplan",             
+              "price":selectedPlan.price,                          
               "tangible":"N",
               "recurrence":"1 Month",
-              "duration":"1 Year",
+              "duration":"Forever",
               "startupFee":null              
             }]
-        };
+        };     
 
-       	//Make the call using the authorization object and your callback function
-		tco.checkout.authorize(params, function (error, data) {
-		    if (error) {
-		    	console.log(error);		       
-		        deferred.reject(error);
-		    } else {
-		    	console.log(data);
-		    	deferred.resolve(data);		        
-		    }
-		});
+        //Make the call using the authorization object and your callback function
+    		tco.checkout.authorize(params, function (error, data) {
+    		    if (error) {    		    			       
+    		      deferred.reject(error);
+    		    } else {                	
+    		    	deferred.resolve(data);		        
+    		    }
+  		  });
         
         return deferred.promise;
     },
+
+    getSaleDetailsByInvoiceId : function(invoiceId){
+        
+      var deferred= q.defer(); 
+
+      args = {
+        invoice_id: invoiceId
+      };
+
+      tco.sales.retrieve(args, function (error, data) {
+          if (error) {
+            deferred.reject(error);  
+          } else {
+            deferred.resolve(data);  
+          }
+      });
+        
+      return deferred.promise;
+    },
+
+    stopRecurring : function(lineItemId){
+        
+      var deferred= q.defer(); 
+
+      args = {
+        lineitem_id: lineItemId
+      };
+
+      tco.sales.stop(args, function (error, data) {
+          if (error) {
+            deferred.reject(error);
+          } else {
+            deferred.resolve(data);
+          }
+      });
+        
+      return deferred.promise;
+    },
+
+
 };        
