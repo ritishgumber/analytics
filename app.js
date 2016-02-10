@@ -1,4 +1,3 @@
-
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoClient = require('mongodb').MongoClient;
@@ -30,15 +29,13 @@ module.exports = function(){
 	    })
 	}
 
-
 	//Routes
 	function attachAPI(){
 	    try{
 	       require('./api/analytics')();
 	       require('./api/userAnalytics')();
 	       require('./api/server')();
-	       require('./api/payments')();	      
-
+	       require('./api/payments')();	              
 	    }catch(e){
 	       console.log(e);
 	    }
@@ -47,7 +44,6 @@ module.exports = function(){
 	//Services
 	function attachServices(){
 		try{
-
 	       global.analyticsService = require('./service/analyticsService.js');	      
 	       global.userApiAnalyticsService = require('./service/userApiAnalyticsService.js');
 	       global.userStorageAnalyticsService = require('./service/userStorageAnalyticsService.js');
@@ -55,15 +51,11 @@ module.exports = function(){
 	       global.paymentsService = require('./service/paymentsService.js');
 	       global.twoCheckoutService = require('./service/twoCheckoutService.js');
 	       global.salesService = require('./service/salesService.js');
-
 	    }catch(e){
 	       console.log(e);
 	    }	    
 	}
 
-
-    attachServices();
-    attachAPI();
 	connectMongoDB();    
     
  	return app;
