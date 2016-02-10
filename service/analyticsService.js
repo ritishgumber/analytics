@@ -2,9 +2,9 @@ var priceChart=require('../config/priceChart.js')();
 
 module.exports = {
 
-	store : function(host, appId, category, subCategory,sdk){
+    store : function(host, appId, category, subCategory,sdk){
         
-		var deferred= q.defer();
+        var deferred= q.defer();
         
         var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.apiNamespace);
         
@@ -28,15 +28,18 @@ module.exports = {
             }else{
                 console.log('++++ Object Updated +++');
                 deferred.resolve(doc);
+
+                //Update UserApiAnalytics
+                global.userApiAnalyticsService.addRecord(host, appId);               
             }
         });
         
         return deferred.promise;
-	},
-    
+    },
+
     totalApiCount : function(host, appId, category, subCategory, fromTime, toTime,sdk){
         
-		var deferred= q.defer();
+        var deferred= q.defer();
         
         var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.apiNamespace);
         
@@ -79,7 +82,7 @@ module.exports = {
         });
         
         return deferred.promise;
-	},
+    },
     
     activeAppWithAPICount : function(fromTime, toTime, limit, skip, sdk){
         
@@ -151,7 +154,7 @@ module.exports = {
         });
         
         return deferred.promise;
-	},
+    },
     
     activeAppCount : function(fromTime, toTime,sdk){
         
@@ -189,7 +192,7 @@ module.exports = {
         });
         
         return deferred.promise;
-	},
+    },
 
     funnelAppCount : function(fromTime, toTime,apiCount,sdk){
         
@@ -304,7 +307,26 @@ module.exports = {
         });
         
         return deferred.promise;
-	},
+    },
+    distinctApps : function(){
+        
+        var deferred= q.defer();
+        
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.apiNamespace);        
+         
+        collection.distinct("appId",function(err,docList){
+            if(err) {
+                console.log("Error getting distinct AppIds");
+                console.log(err);
+                deferred.reject(err);
+            }else{
+                console.log('++++ Object Updated +++');
+                deferred.resolve(docList);
+            }
+        });
+        
+        return deferred.promise;
+    },
     statisticsByAppId : function(appId,fromTime,category,subCategory){
         
         var deferred= q.defer();
@@ -427,6 +449,5 @@ function _processPricing (category,totalApiCount) {
         var bucketsCount=Math.ceil(totalApiCount/priceChart.queueRequestBucket);
         return bucketsCount*priceChart.queueCost;        
     }
-}
-
-
+}  
+    
