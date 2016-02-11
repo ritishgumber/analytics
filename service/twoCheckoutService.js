@@ -46,7 +46,8 @@ module.exports = {
 
         //Make the call using the authorization object and your callback function
     		tco.checkout.authorize(params, function (error, data) {
-    		    if (error) {    		    			       
+    		    if (error) { 
+            console.log("2 checkout error:"+error);   		    			       
     		      deferred.reject(error);
     		    } else {                	
     		    	deferred.resolve(data);		        

@@ -7,6 +7,8 @@ module.exports = function() {
     	  var data = req.body || {};
         var appId=req.params.appId;        
 
+        console.log("From frontend:"+data.secureKey);
+
         if(data.secureKey && global.clusterKeysList[data.secureKey]==1){
             
           global.paymentsService.createSale(appId,data).then(function(respData) {
