@@ -1,40 +1,69 @@
 module.exports ={
 
    
-    saveSale : function(saleDocument){
+    createAppPlan : function(host,appId,planId){
         
         var deferred= q.defer();
         
-        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.salesNamespace);      
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace);      
             
-        collection.save(saleDocument,function(err,doc){
-            if(err) {               
-                deferred.reject(err);
-            }else{                             
-                deferred.resolve(doc.ops[0]);                              
+        _self.findApp(appId).then(function(doc){         
+            if(!doc){
+
+                var newDoc={
+                    host:host,
+                    
+                };
+                _self.insertKey(newDoc).then(function(savedDoc){
+                    deferred.resolve({"status":"Okay"});
+                },function(error){
+                    deferred.reject(error);
+                });
+
+            }else{
+                deferred.resolve({"status":"Okay"});
             }
+            
+            //Add to global clusterkeyObject
+            global.clusterKeysList[secureKey]=1;      
+
+        },function(error){
+            deferred.reject(error);
         });
        
         return deferred.promise; 
-    },
-
-    getLatestSale : function(appId,userId){
+    },  
+    insertKey : function(newDoc){
         
         var deferred= q.defer();
         
-        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.salesNamespace);         
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace);      
+            
+        collection.insertOne(newDoc,function(err,doc){
+            if(err) {               
+                deferred.reject(err);
+            }else{                    
+                deferred.resolve(doc);                              
+            }
+        });
+       
+        return deferred.promise;
+    },
+    findApp : function(host,appId){        
+        
+        var deferred= q.defer();
+        
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace); 
 
-        collection.find({appId:appId,userId:userId}).sort({saleTimestamp:-1}).toArray(function(err,docs){
+        collection.findOne({host:host,appId:appId},function(err,doc){
             if(err) {                
                 deferred.reject(err);
             }else{                
-                deferred.resolve(docs[0]);
+                deferred.resolve(doc);
             }
         });
-       
-        return deferred.promise; 
+        
+        return deferred.promise;
     },
-
-
 };
 

@@ -68,6 +68,8 @@ module.exports ={
 
 
         global.salesService.getLatestSale(appId,userId).then(function(saleDocument){
+            console.log("Sale Document");
+            console.log(saleDocument);
             if(saleDocument){
                 return global.twoCheckoutService.getSaleDetailsByInvoiceId(saleDocument.invoiceId);
             }else{
@@ -76,6 +78,8 @@ module.exports ={
                 return nosaleDocDeffred.promise;
             }
         }).then(function(saleDetails){
+             console.log("Sale Detailed Docs");
+            console.log(saleDetails);
             if(saleDetails){
 
                 //Sort in DESC order
@@ -92,8 +96,12 @@ module.exports ={
                 return noSaleDetDeffred.promise;
             }
         }).then(function(data){
+            console.log("Stop recuring");
+            console.log(data);
             deferred.resolve(data);
         },function(error){
+            console.log("Error in any case");
+            console.log(error);
             deferred.reject(error);
         });
 

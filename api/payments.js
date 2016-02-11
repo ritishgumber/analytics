@@ -30,10 +30,12 @@ module.exports = function() {
     global.app.post('/:appId/cancel',function(req,res){
 
         var data = req.body || {};
-        var appId=req.params.appId;          
+        var appId=req.params.appId;         
        
 
         if(data.secureKey && global.clusterKeysList[data.secureKey]==1){
+
+          console.log("Analytics sever cancel card:"+appId);
             
           global.paymentsService.stopRecurring(appId,data.userId).then(function(respData) {
             if (!respData) {               
