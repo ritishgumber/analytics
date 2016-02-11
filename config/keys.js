@@ -15,7 +15,8 @@ module.exports = function(){
        userApiAnalyticsNamespace : "userApiAnalytics",
        userStorageAnalyticsNamespace : "userStorageAnalytics",
        clustersNamespace : "clusters",
-       salesNamespace : "sales"
+       salesNamespace : "sales",
+       appPlansNamespace : "appPlans"
     };
 };
 

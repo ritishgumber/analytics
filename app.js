@@ -51,6 +51,7 @@ module.exports = function(){
 	       global.paymentsService = require('./service/paymentsService.js');
 	       global.twoCheckoutService = require('./service/twoCheckoutService.js');
 	       global.salesService = require('./service/salesService.js');
+	       global.salesService = require('./service/appPlansService.js');
 	    }catch(e){
 	       console.log(e);
 	    }	    
@@ -71,7 +72,9 @@ function _runDefaultFunctions(){
 			for(var i=0;i<list.length;++i){			
 				global.clusterKeysList[list[i].secureKey]=1;			
 			}
-		}	        
+		}
+		console.log("Secure Keys:");
+		console.log(global.clusterKeysList);		        
 
     }, function(error){           
         console.log("Error in getting cluster keys");

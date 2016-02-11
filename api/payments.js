@@ -20,7 +20,7 @@ module.exports = function() {
           });
 
         }else{         
-          return res.status(400).send("Unauthorized");
+          return res.status(400).send("Unauthorized. Server is not recognized.");
         }
 
     });
@@ -46,7 +46,7 @@ module.exports = function() {
           });
 
         }else{         
-          return res.status(400).send("Unauthorized");
+          return res.status(400).send("Unauthorized. Server is not recognized.");
         }
 
     });
