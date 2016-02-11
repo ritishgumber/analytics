@@ -72,9 +72,7 @@ function _runDefaultFunctions(){
 			for(var i=0;i<list.length;++i){			
 				global.clusterKeysList[list[i].secureKey]=1;			
 			}
-		}
-		console.log("Secure Keys:");
-		console.log(global.clusterKeysList);		        
+		}				        
 
     }, function(error){           
         console.log("Error in getting cluster keys");
