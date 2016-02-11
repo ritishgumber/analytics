@@ -7,7 +7,7 @@ module.exports = function() {
     	  var data = req.body || {};
         var appId=req.params.appId;        
 
-        if(data.secureKey && global.clusterKeysList[data.secureKey]==1){
+        if(data.secureKey && global.keys.hostedSecureKey==data.secureKey){
             
           global.paymentsService.createSale(appId,data).then(function(respData) {
             if (!respData) {               
@@ -33,7 +33,7 @@ module.exports = function() {
         var appId=req.params.appId;         
        
 
-        if(data.secureKey && global.clusterKeysList[data.secureKey]==1){
+        if(data.secureKey && global.keys.hostedSecureKey==data.secureKey){
 
           console.log("Analytics sever cancel card:"+appId);
             

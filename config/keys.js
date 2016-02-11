@@ -1,9 +1,8 @@
 module.exports = function(){
     return {
-       mongodb : "mongodb://cbmongodb1.cloudapp.net/?replicaSet=cloudboost&slaveOk=true",
-       authenticationKey : "109eb359-3d22-4165-9e21-21439637f975",
+       mongodb : "mongodb://cbmongodb1.cloudapp.net/?replicaSet=cloudboost&slaveOk=true",       
        dbName : "_Analytics",
-       hostedSecureKey : "hsygdfshdgfshdsgdhsd",
+       hostedSecureKey : "0824ff47-252e-4828-8bfd-1feddb659b24",
        twoCheckout : {
         apiUser:"nawazdhandala",
         apiPass:"WhiteHouse123",
@@ -13,6 +12,7 @@ module.exports = function(){
        },
        apiNamespace : "API",
        userApiAnalyticsNamespace : "userApiAnalytics",
+       userMonthlyApiNamespace : "userMonthlyApi",
        userStorageAnalyticsNamespace : "userStorageAnalytics",
        clustersNamespace : "clusters",
        salesNamespace : "sales",

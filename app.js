@@ -46,12 +46,14 @@ module.exports = function(){
 		try{
 	       global.analyticsService = require('./service/analyticsService.js');	      
 	       global.userApiAnalyticsService = require('./service/userApiAnalyticsService.js');
+	       global.userMonthlyApiService = require('./service/userMonthlyApiService.js');
 	       global.userStorageAnalyticsService = require('./service/userStorageAnalyticsService.js');
+
 	       global.serverService = require('./service/serverService.js');
 	       global.paymentsService = require('./service/paymentsService.js');
 	       global.twoCheckoutService = require('./service/twoCheckoutService.js');
 	       global.salesService = require('./service/salesService.js');
-	       global.salesService = require('./service/appPlansService.js');
+	       global.appPlansService = require('./service/appPlansService.js');
 	    }catch(e){
 	       console.log(e);
 	    }	    
@@ -95,7 +97,7 @@ function _runUserAnalyticsCronJob(){
 		        }else if(databaseStatList){
 		            
 		            for(var i=0;i<databaseStatList.databases.length;++i){		            	
-		            	global.userStorageAnalyticsService.addRecord(databaseStatList.databases[i].name,databaseStatList.databases[i].sizeOnDisk);
+		            	global.userStorageAnalyticsService.addRecord(global.keys.hostedSecureKey,databaseStatList.databases[i].name,databaseStatList.databases[i].sizeOnDisk);
 		            }                         
 		        }
 			});

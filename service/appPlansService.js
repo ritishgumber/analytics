@@ -1,31 +1,34 @@
 module.exports ={
 
    
-    createAppPlan : function(host,appId,planId){
+    upsertAppPlan : function(host,appId,planId){
         
+        _self=this;
+
         var deferred= q.defer();
         
         var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace);      
             
-        _self.findApp(appId).then(function(doc){         
+        _self.findAppPlan(host,appId).then(function(doc){         
             if(!doc){
 
+                if(!planId){
+                    planId=1;
+                }
                 var newDoc={
                     host:host,
-                    
+                    appId:appId,
+                    planId:planId
                 };
-                _self.insertKey(newDoc).then(function(savedDoc){
-                    deferred.resolve({"status":"Okay"});
+                _self.insertAppPlan(newDoc).then(function(savedDoc){
+                    deferred.resolve(savedDoc.ops[0]);
                 },function(error){
                     deferred.reject(error);
                 });
 
             }else{
-                deferred.resolve({"status":"Okay"});
-            }
-            
-            //Add to global clusterkeyObject
-            global.clusterKeysList[secureKey]=1;      
+                deferred.resolve(doc);
+            }                 
 
         },function(error){
             deferred.reject(error);
@@ -33,7 +36,7 @@ module.exports ={
        
         return deferred.promise; 
     },  
-    insertKey : function(newDoc){
+    insertAppPlan : function(newDoc){
         
         var deferred= q.defer();
         
@@ -49,7 +52,7 @@ module.exports ={
        
         return deferred.promise;
     },
-    findApp : function(host,appId){        
+    findAppPlan : function(host,appId){        
         
         var deferred= q.defer();
         
@@ -64,6 +67,6 @@ module.exports ={
         });
         
         return deferred.promise;
-    },
+    }
 };
 

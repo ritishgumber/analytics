@@ -8,8 +8,12 @@ module.exports = function() {
             var appId = req.body.appId;
             var host = req.body.host;
             var sdk = req.body.sdk;
-            global.analyticsService.store(host,appId, category, subCategory,sdk);
-            res.status(200).json({status : "success"});
+
+            global.analyticsService.store(host,appId, category, subCategory,sdk).then(function(resp){
+                res.status(200).json(resp);
+            },function(error){
+                res.status(400).send(error);
+            });            
         }
     });
     
@@ -103,8 +107,9 @@ module.exports = function() {
             res.status(400).send("Key is required.");
             return false;
         }
-        
-        if(req.body.key !== global.keys.authenticationKey){
+      
+        var key=req.body.key.trim();       
+        if(key && global.clusterKeysList[key]!=1){
             res.status(401).send("Unauthorized");
             return false;
         }

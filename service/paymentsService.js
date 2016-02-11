@@ -1,4 +1,4 @@
- var _ = require('underscore');
+var _ = require('underscore');
 var pricingPlans = require('../config/pricingPlans.js')();
 
 module.exports ={

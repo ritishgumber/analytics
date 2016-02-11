@@ -1,7 +1,7 @@
 module.exports ={
 
    
-    addRecord : function(appId,size){
+    addRecord : function(host,appId,size){
         
         var _self = this;
 
@@ -9,7 +9,8 @@ module.exports ={
      
      	size=(size/1048576);//Convert Bytes to MBs
 
-     	var docJson={            
+     	var docJson={
+            host:host,            
             appId:appId,
             size:size,
             timeStamp: new Date().getTime()
@@ -39,7 +40,7 @@ module.exports ={
        
         return deferred.promise;
     },
-    monthlyAnalyticsByAppId : function(appId,fromTime){
+    monthlyAnalyticsByAppId : function(host,appId,fromTime){
         
         var deferred= q.defer();
         
@@ -53,7 +54,7 @@ module.exports ={
             fromTime=fromTime.getTime();
         }             
       
-        collection.find({appId:appId,timeStamp: {$gte: fromTime}}).toArray(function(err,docs){
+        collection.find({host:host,appId:appId,timeStamp: {$gte: fromTime}}).toArray(function(err,docs){
             if(err) {                               
                 deferred.reject(err);
             }else if(docs && docs.length>0){

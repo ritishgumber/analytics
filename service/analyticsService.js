@@ -1,3 +1,6 @@
+var _ = require('underscore');
+var pricingPlans = require('../config/pricingPlans.js')();
+
 module.exports = {
 
     store : function(host, appId, category, subCategory,sdk){
@@ -24,11 +27,20 @@ module.exports = {
                 console.log(err);
                 deferred.reject(err);
             }else{
-                console.log('++++ Object Updated +++');
-                deferred.resolve(doc);
+                console.log('++++ Object Updated +++');              
 
-                //Update UserApiAnalytics
-                global.userApiAnalyticsService.addRecord(host, appId);               
+                //Update UserApi Day and Monthly wise
+                global.userApiAnalyticsService.addRecord(host, appId);                 
+                global.userMonthlyApiService.addRecord(host, appId);
+
+                _checkAppLimit(host,appId).then(function(response){
+                    deferred.resolve(response);
+                },function(error){
+                    console.log("App Check Limit error");
+                    console.log(error);
+                    
+                    deferred.resolve({limitExceeded:false,message:"Okay"});
+                });              
             }
         });
         
@@ -330,3 +342,65 @@ module.exports = {
 };
 
 
+function _checkAppLimit(host,appId){  
+    var deferred= q.defer();
+
+    global.appPlansService.upsertAppPlan(host,appId,null).then(function(appPlanDoc){        
+        
+        var promises=[];
+
+        //API calls 
+        promises.push(global.userMonthlyApiService.monthlyApiByAppId(appPlanDoc.host,appPlanDoc.appId,null));
+        //Storage 
+        promises.push(global.userStorageAnalyticsService.monthlyAnalyticsByAppId(appPlanDoc.host,appPlanDoc.appId,null));
+
+        q.all(promises).then(function(list){ 
+            var apiCalls=0;
+            var storage=0;
+            var connections=0
+            var boost=0;
+
+            if(list[0] && list[0].monthlyApiCount){
+                apiCalls=list[0].monthlyApiCount;
+            }
+            if(list[1] && list[1].totalStorage){
+                storage=list[1].totalStorage;
+            }
+
+            //var connections=list[0].monthlyApiCount;
+            //var boost=list[0].monthlyApiCount;
+
+            deferred.resolve(_checkLimitExceeded(appPlanDoc.planId,apiCalls,storage)); 
+            
+
+        }, function(err){    
+            deferred.resolve(err);
+        });
+
+
+    },function(error){
+        deferred.resolve(error);
+    });
+
+    return deferred.promise;
+}
+
+function _checkLimitExceeded(planId,apiCalls,storage){
+
+    var currentPlan=_.first(_.where(pricingPlans.plans, {id: planId}));
+
+    if(apiCalls!=0){
+       if(apiCalls>currentPlan.apiCalls){
+            return {limitExceeded:true,message:"API Calls limit exceeded "+currentPlan.apiCalls+" for "+currentPlan.planName};
+        } 
+    }    
+
+    if(storage!=0){
+        storage=(storage/1024);
+        if(storage>currentPlan.storage){
+            return {limitExceeded:true,message:"Storage limit exceeded "+currentPlan.storage+"(GB) for "+currentPlan.planName};
+        }
+    }    
+
+    return {limitExceeded:false,message:"Okay"};
+}
