@@ -102,13 +102,9 @@ module.exports = function() {
         if(!req.body.host){
             res.status(400).send("Host is required.");
             return false;
-        }
-        if(!req.body.key){
-            res.status(400).send("Key is required.");
-            return false;
-        }
+        }       
       
-        var key=req.body.key.trim();       
+        var key=req.body.host.trim();       
         if(key && global.clusterKeysList[key]!=1){
             res.status(401).send("Unauthorized");
             return false;

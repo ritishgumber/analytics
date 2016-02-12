@@ -16,7 +16,7 @@ module.exports ={
 
 
         if(!errorMsg){
-            _self.stopRecurring(appId,data.userId).then(function(recurringDoc){//Remove previous plan first
+            _self.stopRecurring(data.secureKey,appId,data.userId).then(function(recurringDoc){//Remove previous plan first
 
                 return global.twoCheckoutService.createSale(data,selectedPlan);//create sale
 
@@ -36,7 +36,10 @@ module.exports ={
                         responseMsg:saleDocument.response.responseMsg,
                         saleTimestamp: new Date().getTime()
                     };                  
+                    
+                    global.appPlansService.updatePlanId(data.secureKey,appId,selectedPlan.id);//update appPlan
                     return global.salesService.saveSale(saveSaleObj);//add document for records
+
                 }else{
                     var failedRespDeffred= q.defer();
                     failedRespDeffred.reject("Failed to Purchase..Try again");
@@ -60,16 +63,14 @@ module.exports ={
         return deferred.promise; 
     },
 
-    stopRecurring : function(appId,userId){
+    stopRecurring : function(host,appId,userId){
         
         var _self = this;
 
         var deferred= q.defer();        
 
 
-        global.salesService.getLatestSale(appId,userId).then(function(saleDocument){
-            console.log("Sale Document");
-            console.log(saleDocument);
+        global.salesService.getLatestSale(appId,userId).then(function(saleDocument){           
             if(saleDocument){
                 return global.twoCheckoutService.getSaleDetailsByInvoiceId(saleDocument.invoiceId);
             }else{
@@ -77,9 +78,7 @@ module.exports ={
                 nosaleDocDeffred.resolve(null);
                 return nosaleDocDeffred.promise;
             }
-        }).then(function(saleDetails){
-             console.log("Sale Detailed Docs");
-            console.log(saleDetails);
+        }).then(function(saleDetails){            
             if(saleDetails){
 
                 //Sort in DESC order
@@ -87,7 +86,7 @@ module.exports ={
                     var c = new Date(a.date_placed);
                     var d = new Date(b.date_placed);
                     return d-c;
-                });
+                });                
 
                 return global.twoCheckoutService.stopRecurring(saleDetails.sale.invoices[0].lineitems[0].lineitem_id);
             }else{
@@ -95,14 +94,20 @@ module.exports ={
                 noSaleDetDeffred.resolve(null);
                 return noSaleDetDeffred.promise;
             }
-        }).then(function(data){
-            console.log("Stop recuring");
-            console.log(data);
-            deferred.resolve(data);
-        },function(error){
-            console.log("Error in any case");
-            console.log(error);
-            deferred.reject(error);
+        }).then(function(data){ 
+
+            var planId=1;//make it to 1
+            return global.appPlansService.updatePlanId(host,appId,planId);//update appPlan with first plan          
+            
+        }).then(function(updatedPlan){
+            deferred.resolve({message:"success"});
+        },function(error){ 
+            if(error && error.message && error.message=="Lineitem is not scheduled to recur."){
+                deferred.resolve({message:"Lineitem is not scheduled to recur."});
+            }else{
+                deferred.reject(error);
+            }           
+            
         });
 
         return deferred.promise; 

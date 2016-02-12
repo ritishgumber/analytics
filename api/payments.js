@@ -30,14 +30,11 @@ module.exports = function() {
     global.app.post('/:appId/cancel',function(req,res){
 
         var data = req.body || {};
-        var appId=req.params.appId;         
-       
+        var appId=req.params.appId;       
 
-        if(data.secureKey && global.keys.hostedSecureKey==data.secureKey){
-
-          console.log("Analytics sever cancel card:"+appId);
+        if(data.secureKey && global.keys.hostedSecureKey==data.secureKey){          
             
-          global.paymentsService.stopRecurring(appId,data.userId).then(function(respData) {
+          global.paymentsService.stopRecurring(data.secureKey,appId,data.userId).then(function(respData) {
             if (!respData) {               
               return res.status(400).send('Error : No Document Found!');
             }               

@@ -35,7 +35,8 @@ module.exports = function(){
 	       require('./api/analytics')();
 	       require('./api/userAnalytics')();
 	       require('./api/server')();
-	       require('./api/payments')();	              
+	       require('./api/payments')();
+	       require('./api/appPlans')();	              
 	    }catch(e){
 	       console.log(e);
 	    }
@@ -54,6 +55,7 @@ module.exports = function(){
 	       global.twoCheckoutService = require('./service/twoCheckoutService.js');
 	       global.salesService = require('./service/salesService.js');
 	       global.appPlansService = require('./service/appPlansService.js');
+	       global.notificationService = require('./service/notificationService.js');
 	    }catch(e){
 	       console.log(e);
 	    }	    
