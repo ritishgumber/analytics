@@ -1,11 +1,17 @@
+var _ = require('underscore');
+var pricingPlans = require('../config/pricingPlans.js')();
+
 module.exports = {
 
-	store : function(host, appId, category, subCategory,sdk){
+    store : function(host, appId, category, subCategory,sdk){
         
-		var deferred= q.defer();
+        var deferred= q.defer();
         
         var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.apiNamespace);
         
+        category=category.trim();
+        subCategory=subCategory.trim();
+
         var document = {
           host : host,
           appId : appId, 
@@ -16,22 +22,34 @@ module.exports = {
         };
         
         collection.save(document,function(err,doc){
-                if(err) {
-                    console.log("Error while saving API");
-                    console.log(err);
-                    deferred.reject(err);
-                }else{
-                    console.log('++++ Object Updated +++');
-                    deferred.resolve(doc);
-                }
+            if(err) {
+                console.log("Error while saving API");
+                console.log(err);
+                deferred.reject(err);
+            }else{
+                console.log('++++ Object Updated +++');              
+
+                //Update UserApi Day and Monthly wise
+                global.userApiAnalyticsService.addRecord(host, appId);                 
+                global.userMonthlyApiService.addRecord(host, appId);
+
+                _checkAppLimit(host,appId).then(function(response){
+                    deferred.resolve(response);
+                },function(error){
+                    console.log("App Check Limit error");
+                    console.log(error);
+                    
+                    deferred.resolve({limitExceeded:false,message:"Okay"});
+                });              
+            }
         });
         
         return deferred.promise;
-	},
-    
+    },
+
     totalApiCount : function(host, appId, category, subCategory, fromTime, toTime,sdk){
         
-		var deferred= q.defer();
+        var deferred= q.defer();
         
         var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.apiNamespace);
         
@@ -74,7 +92,7 @@ module.exports = {
         });
         
         return deferred.promise;
-	},
+    },
     
     activeAppWithAPICount : function(fromTime, toTime, limit, skip, sdk){
         
@@ -146,7 +164,7 @@ module.exports = {
         });
         
         return deferred.promise;
-	},
+    },
     
     activeAppCount : function(fromTime, toTime,sdk){
         
@@ -184,7 +202,7 @@ module.exports = {
         });
         
         return deferred.promise;
-	},
+    },
 
     funnelAppCount : function(fromTime, toTime,apiCount,sdk){
         
@@ -299,6 +317,90 @@ module.exports = {
         });
         
         return deferred.promise;
-	}
+    },
+    distinctApps : function(){
+        
+        var deferred= q.defer();
+        
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.apiNamespace);        
+         
+        collection.distinct("appId",function(err,docList){
+            if(err) {
+                console.log("Error getting distinct AppIds");
+                console.log(err);
+                deferred.reject(err);
+            }else{
+                console.log('++++ Object Updated +++');
+                deferred.resolve(docList);
+            }
+        });
+        
+        return deferred.promise;
+    }  
+    
        
 };
+
+
+function _checkAppLimit(host,appId){  
+    var deferred= q.defer();
+
+    global.appPlansService.upsertAppPlan(host,appId,null).then(function(appPlanDoc){        
+        
+        var promises=[];
+
+        //API calls 
+        promises.push(global.userMonthlyApiService.monthlyApiByAppId(appPlanDoc.host,appPlanDoc.appId,null));
+        //Storage 
+        promises.push(global.userStorageAnalyticsService.monthlyAnalyticsByAppId(appPlanDoc.host,appPlanDoc.appId,null));
+
+        q.all(promises).then(function(list){ 
+            var apiCalls=0;
+            var storage=0;
+            var connections=0
+            var boost=0;
+
+            if(list[0] && list[0].monthlyApiCount){
+                apiCalls=list[0].monthlyApiCount;
+            }
+            if(list[1] && list[1].totalStorage){
+                storage=list[1].totalStorage;
+            }
+
+            //var connections=list[0].monthlyApiCount;
+            //var boost=list[0].monthlyApiCount;
+
+            deferred.resolve(_checkLimitExceeded(appPlanDoc.planId,apiCalls,storage)); 
+            
+
+        }, function(err){    
+            deferred.resolve(err);
+        });
+
+
+    },function(error){
+        deferred.resolve(error);
+    });
+
+    return deferred.promise;
+}
+
+function _checkLimitExceeded(planId,apiCalls,storage){
+
+    var currentPlan=_.first(_.where(pricingPlans.plans, {id: planId}));
+
+    if(apiCalls!=0){
+       if(apiCalls>currentPlan.apiCalls){
+            return {limitExceeded:true,message:"API Calls limit exceeded "+currentPlan.apiCalls+" for "+currentPlan.planName};
+        } 
+    }    
+
+    if(storage!=0){
+        storage=(storage/1024);
+        if(storage>currentPlan.storage){
+            return {limitExceeded:true,message:"Storage limit exceeded "+currentPlan.storage+"(GB) for "+currentPlan.planName};
+        }
+    }    
+
+    return {limitExceeded:false,message:"Okay"};
+}
