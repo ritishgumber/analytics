@@ -12,15 +12,15 @@ module.exports = function() {
             }, function(error){           
                 return res.status(400).send(error);
             });
-        }else{
-            return res.send(400, "Unauthorized");
+        }else{            
+            return res.status(400).send("Unauthorized");
         }
 
     });
 
 
     //get monthly User Analytics
-    global.app.post('/:appId/api',function(req,res){
+    global.app.post('/:appId/api/usage',function(req,res){
 
         var data = req.body || {};
         var appId=req.params.appId;        
@@ -32,25 +32,62 @@ module.exports = function() {
 	            return res.status(400).send(error);
 	        });
     	}else{
-            return res.send(400, "Unauthorized");
+           return res.status(400).send("Unauthorized");
         }
 
     });
 
     //get monthly Storage
-    global.app.post('/:appId/storage',function(req,res){
+    global.app.post('/:appId/storage/usage',function(req,res){
 
         var data = req.body || {}; 
         var appId=req.params.appId;        
 
         if(data.secureKey && global.keys.hostedSecureKey==data.secureKey){
-            global.userStorageAnalyticsService.monthlyAnalyticsByAppId(appId,null).then(function(result){
+            global.userStorageAnalyticsService.monthlyAnalyticsByAppId(data.secureKey,appId,null).then(function(result){
                return res.status(200).json(result);
             }, function(error){           
                 return res.status(400).send(error);
             });
         }else{
-            return res.send(400, "Unauthorized");
+            return res.status(400).send("Unauthorized");
+        }
+
+    });
+
+
+    //get monthly User Analytics
+    global.app.post('/:appId/api/count',function(req,res){
+
+        var data = req.body || {};
+        var appId=req.params.appId;        
+
+        if(data.secureKey && global.keys.hostedSecureKey==data.secureKey){
+            global.userMonthlyApiService.monthlyApiByAppId(data.secureKey,appId,null).then(function(result){                
+               return res.status(200).json(result);
+            }, function(error){           
+                return res.status(400).send(error);
+            });
+        }else{
+            return res.status(400).send("Unauthorized");
+        }
+
+    });
+
+    //get LastDay Storage
+    global.app.post('/:appId/storage/count',function(req,res){
+
+        var data = req.body || {}; 
+        var appId=req.params.appId;        
+
+        if(data.secureKey && global.keys.hostedSecureKey==data.secureKey){
+            global.userStorageAnalyticsService.lastRecordByAppId(data.secureKey,appId).then(function(result){
+               return res.status(200).json(result);
+            }, function(error){           
+                return res.status(400).send(error);
+            });
+        }else{
+            return res.status(400).send("Unauthorized");
         }
 
     });

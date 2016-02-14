@@ -40,7 +40,7 @@ module.exports = {
                     console.log("App Check Limit error");
                     console.log(error);
                     
-                    deferred.resolve({limitExceeded:false,message:"Okay"});
+                    deferred.resolve({appId:appId,limitExceeded:false,message:"Okay"});
                 });              
             }
         });
@@ -373,7 +373,7 @@ function _checkAppLimit(host,appId){
 
             
             _check80Percentage(host,appPlanDoc.appId,appPlanDoc.planId,apiCalls,storage);
-            var over100Doc= _check100Percentage(appPlanDoc.planId,apiCalls,storage);
+            var over100Doc= _check100Percentage(appPlanDoc.appId,appPlanDoc.planId,apiCalls,storage);
             deferred.resolve(over100Doc);
 
             if(over100Doc.limitExceeded){
@@ -392,23 +392,23 @@ function _checkAppLimit(host,appId){
     return deferred.promise;
 }
 
-function _check100Percentage(planId,apiCalls,storage){    
+function _check100Percentage(appId,planId,apiCalls,storage){    
     var currentPlan=_.first(_.where(pricingPlans.plans, {id: planId}));   
    
     if(apiCalls!=0){       
         if(apiCalls>currentPlan.apiCalls){
-            return {limitExceeded:true,message:"API Calls limit exceeded "+currentPlan.apiCalls+" for "+currentPlan.planName};
+            return {appId:appId,limitExceeded:true,message:"API Calls limit exceeded "+currentPlan.apiCalls+" for "+currentPlan.planName};
         }
     }    
 
     if(storage!=0){
         storage=(storage/1024);
         if(storage>currentPlan.storage){
-            return {limitExceeded:true,message:"Storage limit exceeded "+currentPlan.storage+"(GB) for "+currentPlan.planName};
+            return {appId:appId,limitExceeded:true,message:"Storage limit exceeded "+currentPlan.storage+"(GB) for "+currentPlan.planName};
         }
     }    
 
-    return {limitExceeded:false,message:"Okay"};
+    return {appId:appId,limitExceeded:false,message:"Okay"};
 }
 
 function _check80Percentage(host,appId,planId,apiCalls,storage){

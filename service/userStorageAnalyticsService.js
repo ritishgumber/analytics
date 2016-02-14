@@ -76,6 +76,31 @@ module.exports ={
         });
         
         return deferred.promise;
+    },
+    lastRecordByAppId : function(host,appId){
+        
+        var deferred= q.defer();
+        
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.userStorageAnalyticsNamespace);
+        
+        collection.findOne({host:host,appId:appId},{sort:{timeStamp: -1} }).then(function(doc){
+            if(doc){
+                if(doc.host){
+                    delete doc.host;
+                }
+                deferred.resolve(doc);                 
+            }else{
+                var defaultResp={                              
+                    appId:appId,
+                    size:0                    
+                };
+                deferred.resolve(defaultResp);
+            }
+        },function(error){
+            deferred.reject(error);
+        });
+        
+        return deferred.promise;
     }
 
 };
@@ -85,7 +110,8 @@ function _prepareResponse(dayCountList) {
     
     var totalStorage=0;
     for(var i=0;i<dayCountList.length;++i){
-        totalStorage=totalStorage+parseInt(dayCountList[i].size)
+        totalStorage=totalStorage+parseInt(dayCountList[i].size);
+        delete dayCountList[i].host;
     }  
    
     var response={                     
