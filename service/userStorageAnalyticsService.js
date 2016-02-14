@@ -1,26 +1,37 @@
 module.exports ={
 
    
-    addRecord : function(host,appId,size){
+    addRecords : function(host,dbArray){
         
         var _self = this;
 
-        var deferred= q.defer();
+        var deferred= q.defer();        
      
-     	size=(size/1048576);//Convert Bytes to MBs
+        if(dbArray && dbArray.length>0){
 
-     	var docJson={
-            host:host,            
-            appId:appId,
-            size:size,
-            timeStamp: new Date().getTime()
-        };
-        
-        _self.insertOne(docJson).then(function(doc){         
-        	deferred.resolve(doc);
-        },function(error){
-            deferred.reject(error);
-        });
+            var promises=[];
+            for(var i=0;i<dbArray.length;++i){
+
+                var size=(dbArray[i].sizeOnDisk/1048576);//Convert Bytes to MBs
+                var docJson={
+                    host:host,            
+                    appId:dbArray[i].name,
+                    size:size,
+                    timeStamp: new Date().getTime()
+                };
+
+                promises.push(_self.insertOne(docJson));
+            }
+
+            q.all(promises).then(function(list){ 
+                deferred.resolve(list);
+            }, function(err){    
+                deferred.resolve(err);
+            });            
+
+        }else{
+            deferred.resolve({message:"Empty DB Array"});
+        }        
 
         return deferred.promise;
     },
