@@ -2,15 +2,15 @@ module.exports = function(){
     return {
        mongodb : "mongodb://cbmongodb1.cloudapp.net/?replicaSet=cloudboost&slaveOk=true",       
        dbName : "_Analytics",
-       hostedSecureKey : "0824ff47-252e-4828-8bfd-1feddb659b24",
+       hostedSecureKey : "c5aeafe6-32fe-4f60-b369-1fe22d5f8f99",
        twoCheckout : {
-        apiUser:"rtbathulasuper",
-        apiPass:"Harinathsir9#",
-        sellerId:"901307760",
-        privateKey:"4D33B4B4-6DC0-47D1-A642-436CECE51B8F",
-        sandbox:true
+        apiUser:"nawazdhandala",
+        apiPass:"WhiteHouse123",
+        sellerId:"202796222",
+        privateKey:"F4A419F9-32AD-4BD9-B045-022309D78DB4",
+        sandbox:false
        },
-       frontendServiceUrl:"http://localhost:3000",
+       frontendServiceUrl:"https://service.cloudboost.io",
        apiNamespace : "API",
        userApiAnalyticsNamespace : "userApiAnalytics",
        userMonthlyApiNamespace : "userMonthlyApi",

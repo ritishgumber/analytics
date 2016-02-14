@@ -416,12 +416,10 @@ function _check80Percentage(host,appId,planId,apiCalls,storage){
     var exceeded80=[];    
 
     var currentPlan=_.first(_.where(pricingPlans.plans, {id: planId}));
-    var per80=(80/100);   
-
-    apiCalls=10;
+    var per80=(80/100);      
 
     if(apiCalls!=0){
-        var apiCalls80Per=(4*per80);
+        var apiCalls80Per=(currentPlan.apiCalls*per80);
         if(apiCalls>apiCalls80Per){
             var response={}
             response.over80=true;
