@@ -3,17 +3,29 @@ module.exports = function() {
     //Save the API request to the database.
     global.app.post('/api/store',function(req,res){
         if(_validate(req,res)){
+            
             var category = req.body.category;
             var subCategory = req.body.subCategory;
             var appId = req.body.appId;
             var host = req.body.host;
             var sdk = req.body.sdk;
 
-            global.analyticsService.store(host,appId, category, subCategory,sdk).then(function(resp){
-                res.status(200).json(resp);
+            host=host.trim();      
+            global.serverService.findKey(host).then(function(keyObj){
+
+                if(keyObj){
+                    global.analyticsService.store(host,appId, category, subCategory,sdk).then(function(resp){
+                        res.status(200).json(resp);
+                    },function(error){
+                        res.status(400).send(error);
+                    });
+                }else{
+                    res.status(401).send("Unauthorized");
+                }                
+
             },function(error){
-                res.status(400).send(error);
-            });            
+                res.status(401).send("Unauthorized");
+            });                        
         }
     });
     
@@ -103,12 +115,6 @@ module.exports = function() {
             res.status(400).send("Host is required.");
             return false;
         }       
-      
-        var key=req.body.host.trim();       
-        if(key && global.clusterKeysList[key]!=1){
-            res.status(401).send("Unauthorized");
-            return false;
-        }
         
         return true;
     }

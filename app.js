@@ -22,10 +22,9 @@ module.exports = function(){
 
 	            //allowing services to run after connecting to mongoDB
 	            attachServices();
-   				attachAPI();
-   				_runDefaultFunctions();    			
+   				attachAPI();   				   			
 	        }
-	    })
+	    });
 	}
 
 	//Routes
@@ -64,20 +63,3 @@ module.exports = function(){
     
  	return app;
 };
-
-function _runDefaultFunctions(){
-	global.clusterKeysList={};	
-
-	global.serverService.getList().then(function(list){
-
-		if(list){
-			for(var i=0;i<list.length;++i){			
-				global.clusterKeysList[list[i].secureKey]=1;			
-			}
-		}				        
-
-    }, function(error){           
-        console.log("Error in getting cluster keys");
-    });
-}
-

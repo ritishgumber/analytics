@@ -11,7 +11,9 @@ module.exports = {
         var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.apiNamespace);
         
         category=category.trim();
-        subCategory=subCategory.trim();
+        if(subCategory){
+           subCategory=subCategory.trim(); 
+        }        
 
         var document = {
           host : host,
