@@ -80,7 +80,7 @@ module.exports ={
     lastRecordByAppId : function(host,appId){
         
         var deferred= q.defer();
-        pa
+      
         var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.userStorageAnalyticsNamespace);
         
         collection.findOne({host:host,appId:appId},{sort:{timeStamp: -1} }).then(function(doc){
