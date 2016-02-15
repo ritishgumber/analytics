@@ -12,3 +12,4 @@ module.exports = function(){
 	
     global.app.use(cors(corsOptions));
 };
+

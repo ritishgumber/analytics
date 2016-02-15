@@ -11,8 +11,68 @@ module.exports = function(){
 	global.app.use(bodyParser.json());
 	require('./config/cors.js')(); //cors
 
+	
+
 	function connectMongoDB(){
-		mongoClient.connect(global.keys.mongodb,function (err, db) {
+	   //MongoDB connections. 
+
+	   if(!global.config && !process.env["ANALYTICS_MONGO_SERVICE_HOST"]){
+	      console.error("FATAL : MongoDB Cluster Not found. Use docker-compose from https://github.com/cloudboost/docker or Kubernetes from https://github.com/cloudboost/kubernetes");
+	   }
+
+	   var mongoConnectionString = "mongodb://";
+	   
+	   var isReplicaSet = false;
+	   
+	   if(global.config && global.config.mongo && global.config.mongo.length>0){
+	       //take from config file
+	       
+	       if(global.config.mongo.length>1){
+	           isReplicaSet = true;
+	       }
+	       
+	       for(var i=0;i<global.config.mongo.length;i++){
+	            mongoConnectionString+=global.config.mongo[i].host +":"+global.config.mongo[i].port;
+	            mongoConnectionString+=",";
+	       }
+
+	   }else{
+	        
+	        if(!global.config){
+	            global.config = {};
+	        }
+
+	        global.config.mongo = []; 
+	        
+	       if(process.env["ANALYTICS_MONGO_SERVICE_HOST"]){
+	            console.log("MongoDB is running on Kubernetes");
+	           
+	            global.config.mongo.push({
+	                host :  process.env["ANALYTICS_MONGO_SERVICE_HOST"],
+	                port : process.env["ANALYTICS_MONGO_SERVICE_PORT"]
+	            });
+
+	            mongoConnectionString+=process.env["ANALYTICS_MONGO_SERVICE_HOST"]+":"+process.env["ANALYTICS_MONGO_SERVICE_PORT"]; 
+	            mongoConnectionString+=",";
+	            
+	            isReplicaSet = true;    
+	       }
+	   }
+	  
+	   mongoConnectionString = mongoConnectionString.substring(0, mongoConnectionString.length - 1);
+	   mongoConnectionString += "/"; //de limitter. 
+	   global.keys.mongoConnectionString = mongoConnectionString;
+
+	   if(isReplicaSet){
+	       console.log("MongoDB is in ReplicaSet");
+	       var str = "?replicaSet=cloudboostanalytics&slaveOk=true";
+	       global.keys.mongoConnectionString+=str;
+	   }
+
+	   console.log("MongoDB connection string : ");
+	   console.log(global.keys.mongoConnectionString);
+	   
+	   mongoClient.connect(global.keys.mongoConnectionString,function (err, db) {
 	        if (err) {
 	            console.log("Error connecting to MongoDB");
 	            console.log(err);
@@ -25,6 +85,7 @@ module.exports = function(){
    				attachAPI();   				   			
 	        }
 	    });
+
 	}
 
 	//Routes

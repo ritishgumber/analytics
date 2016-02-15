@@ -1,3 +1,9 @@
+try{//Load the configuration.
+    global.config = require('./config/cloudboost');
+}catch(e){
+    //File not found. 
+    global.config = null;
+}
 global.isDevelopment = process.env.PORT ? false:true;
 global.q = require('q');
 global.keys = require('./config/keys.js')();
