@@ -4,7 +4,13 @@ try{//Load the configuration.
     //File not found. 
     global.config = null;
 }
-global.isDevelopment = process.env.PORT ? false:true;
+
+if(global.config){
+    global.isDevelopment=true;
+}else{
+    global.isDevelopment=false;
+}
+
 global.q = require('q');
 global.keys = require('./config/keys.js')();
 
