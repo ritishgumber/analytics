@@ -82,7 +82,7 @@ module.exports = function(){
 
 	            //allowing services to run after connecting to mongoDB
 	            attachServices();
-   				attachAPI();   				   			
+   				attachAPI();   				   				   			
 	        }
 	    });
 
@@ -120,7 +120,7 @@ module.exports = function(){
 	    }	    
 	}
 
-	connectMongoDB();    
+	connectMongoDB();
     
  	return app;
 };

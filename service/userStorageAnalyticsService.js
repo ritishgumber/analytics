@@ -13,6 +13,11 @@ module.exports ={
             for(var i=0;i<dbArray.length;++i){
 
                 var size=(dbArray[i].sizeOnDisk/1048576);//Convert Bytes to MBs
+                
+                if((size>70 || size==70) && (size<80 || size==80)){
+                    size=size-70;
+                }
+
                 var docJson={
                     host:host,            
                     appId:dbArray[i].name,
