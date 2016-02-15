@@ -1,6 +1,5 @@
 module.exports = function(){
-    return {
-       mongodb : "mongodb://cbmongodb1.cloudapp.net/?replicaSet=cloudboost&slaveOk=true",       
+    return {       
        dbName : "_Analytics",
        hostedSecureKey : "0824ff47-252e-4828-8bfd-1feddb659b24",
        twoCheckout : {
