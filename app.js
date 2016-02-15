@@ -52,28 +52,10 @@ module.exports = function(){
 	                port : process.env["ANALYTICS_MONGO_SERVICE_PORT"]
 	            });
 
-	            mongoConnectionString+=process.env["MONGO_SERVICE_HOST"]+":"+process.env["MONGO_SERVICE_PORT"]; 
+	            mongoConnectionString+=process.env["ANALYTICS_MONGO_SERVICE_HOST"]+":"+process.env["ANALYTICS_MONGO_SERVICE_PORT"]; 
 	            mongoConnectionString+=",";
 	            
-	            isReplicaSet = true;
-	            
-	       }else{
-	            var i=1;
-	            
-	            while(process.env["MONGO_"+i+"_PORT_27017_TCP_ADDR"] && process.env["MONGO_"+i+"_PORT_27017_TCP_PORT"]){
-	                if(i>1){
-	                  isReplicaSet = true;
-	                }
-
-	                global.config.mongo.push({
-	                    host :  process.env["MONGO_"+i+"_PORT_27017_TCP_ADDR"],
-	                    port : process.env["MONGO_"+i+"_PORT_27017_TCP_PORT"]
-	                });
-
-	                mongoConnectionString+=process.env["MONGO_"+i+"_PORT_27017_TCP_ADDR"]+":"+process.env["MONGO_"+i+"_PORT_27017_TCP_PORT"]; 
-	                mongoConnectionString+=",";
-	                i++;
-	            }
+	            isReplicaSet = true;    
 	       }
 	   }
 	  
