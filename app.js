@@ -1,17 +1,3 @@
-<<<<<<< HEAD
-module.exports = function(){
-
-	require('./config/dbConnection.js')();
-	var express = require('express');
-	var bodyParser = require('body-parser');		
-
-	global.app = express();
-
-	global.app.use('/',express.static(__dirname + '/public'));
-	global.app.use(bodyParser.urlencoded({extended:true}));
-	global.app.use(bodyParser.json());
-	require('./config/cors.js')(); //cors!
-=======
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoClient = require('mongodb').MongoClient;
@@ -42,19 +28,14 @@ module.exports = function(){
 	        }
 	    })
 	}
->>>>>>> cc53f4d22d0fcfe4370b01a6e148e63c087183c8
 
 	//Routes
 	function attachAPI(){
 	    try{
 	       require('./api/analytics')();
-<<<<<<< HEAD
-	       require('./api/statistics')();
-=======
 	       require('./api/userAnalytics')();
 	       require('./api/server')();
 	       require('./api/payments')();	              
->>>>>>> cc53f4d22d0fcfe4370b01a6e148e63c087183c8
 	    }catch(e){
 	       console.log(e);
 	    }
@@ -63,9 +44,6 @@ module.exports = function(){
 	//Services
 	function attachServices(){
 		try{
-<<<<<<< HEAD
-	       global.analyticsService = require('./service/analytics.js');
-=======
 	       global.analyticsService = require('./service/analyticsService.js');	      
 	       global.userApiAnalyticsService = require('./service/userApiAnalyticsService.js');
 	       global.userMonthlyApiService = require('./service/userMonthlyApiService.js');
@@ -76,21 +54,11 @@ module.exports = function(){
 	       global.twoCheckoutService = require('./service/twoCheckoutService.js');
 	       global.salesService = require('./service/salesService.js');
 	       global.appPlansService = require('./service/appPlansService.js');
->>>>>>> cc53f4d22d0fcfe4370b01a6e148e63c087183c8
 	    }catch(e){
 	       console.log(e);
 	    }	    
 	}
 
-<<<<<<< HEAD
-    attachServices();
-    attachAPI();	 
-
- 	return app;
-};
-
-
-=======
 	connectMongoDB();    
     
  	return app;
@@ -145,4 +113,3 @@ function _runUserAnalyticsCronJob(){
 		console.log("User Storage Analytics cron pattern not valid");
 	}
 }
->>>>>>> cc53f4d22d0fcfe4370b01a6e148e63c087183c8
