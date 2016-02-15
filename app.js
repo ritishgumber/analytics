@@ -101,8 +101,7 @@ module.exports = function(){
 	            //allowing services to run after connecting to mongoDB
 	            attachServices();
    				attachAPI();
-   				_runDefaultFunctions();
-    			_runUserAnalyticsCronJob();	
+   				_runDefaultFunctions();    			
 	        }
 	    });
 	   
@@ -114,7 +113,8 @@ module.exports = function(){
 	       require('./api/analytics')();
 	       require('./api/userAnalytics')();
 	       require('./api/server')();
-	       require('./api/payments')();	              
+	       require('./api/payments')();
+	       require('./api/appPlans')();	              
 	    }catch(e){
 	       console.log(e);
 	    }
@@ -133,6 +133,7 @@ module.exports = function(){
 	       global.twoCheckoutService = require('./service/twoCheckoutService.js');
 	       global.salesService = require('./service/salesService.js');
 	       global.appPlansService = require('./service/appPlansService.js');
+	       global.notificationService = require('./service/notificationService.js');
 	    }catch(e){
 	       console.log(e);
 	    }	    
@@ -149,7 +150,6 @@ function _runDefaultFunctions(){
 	global.serverService.getList().then(function(list){
 
 		if(list){
-
 			for(var i=0;i<list.length;++i){			
 				global.clusterKeysList[list[i].secureKey]=1;			
 			}
@@ -160,35 +160,3 @@ function _runDefaultFunctions(){
     });
 }
 
-function _runUserAnalyticsCronJob(){		
-
-	try {
-		
-		var UserStorageAnalyticsJob = new CronJob('58 58 23 * * *', function() {
-		  /*
-		   * Runs every day
-		   * at 11:58:58 PM(58 58 23 * * *)		   
-		   */
-		    
-		    global.mongoClient.command({listDatabases: 1},function(err, databaseStatList){
-				if(err) {            
-		            console.log(err);            
-		        }else if(databaseStatList){
-		            
-		            for(var i=0;i<databaseStatList.databases.length;++i){		            	
-		            	global.userStorageAnalyticsService.addRecord(global.keys.hostedSecureKey,databaseStatList.databases[i].name,databaseStatList.databases[i].sizeOnDisk);
-		            }                         
-		        }
-			});
-
-		  }, function () {
-		    /* This function is executed when the job stops */
-		  },
-		  true, /* Start the job right now */
-		  null /* Time zone of this job. */
-		);
-
-	} catch(ex) {
-		console.log("User Storage Analytics cron pattern not valid");
-	}
-}

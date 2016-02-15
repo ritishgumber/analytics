@@ -1,3 +1,4 @@
+var request = require('request');
 var _ = require('underscore');
 var pricingPlans = require('../config/pricingPlans.js')();
 
@@ -39,7 +40,7 @@ module.exports = {
                     console.log("App Check Limit error");
                     console.log(error);
                     
-                    deferred.resolve({limitExceeded:false,message:"Okay"});
+                    deferred.resolve({appId:appId,limitExceeded:false,message:"Okay"});
                 });              
             }
         });
@@ -370,8 +371,14 @@ function _checkAppLimit(host,appId){
             //var connections=list[0].monthlyApiCount;
             //var boost=list[0].monthlyApiCount;
 
-            deferred.resolve(_checkLimitExceeded(appPlanDoc.planId,apiCalls,storage)); 
             
+            _check80Percentage(host,appPlanDoc.appId,appPlanDoc.planId,apiCalls,storage);
+            var over100Doc= _check100Percentage(appPlanDoc.appId,appPlanDoc.planId,apiCalls,storage);
+            deferred.resolve(over100Doc);
+
+            if(over100Doc.limitExceeded){
+                _processNotifyFrontendOver100(host,appPlanDoc.appId,appPlanDoc.planId,over100Doc);
+            }                         
 
         }, function(err){    
             deferred.resolve(err);
@@ -385,22 +392,160 @@ function _checkAppLimit(host,appId){
     return deferred.promise;
 }
 
-function _checkLimitExceeded(planId,apiCalls,storage){
-
-    var currentPlan=_.first(_.where(pricingPlans.plans, {id: planId}));
-
-    if(apiCalls!=0){
-       if(apiCalls>currentPlan.apiCalls){
-            return {limitExceeded:true,message:"API Calls limit exceeded "+currentPlan.apiCalls+" for "+currentPlan.planName};
-        } 
+function _check100Percentage(appId,planId,apiCalls,storage){    
+    var currentPlan=_.first(_.where(pricingPlans.plans, {id: planId}));   
+   
+    if(apiCalls!=0){       
+        if(apiCalls>currentPlan.apiCalls){
+            return {appId:appId,limitExceeded:true,message:"API Calls limit exceeded "+currentPlan.apiCalls+" for "+currentPlan.planName};
+        }
     }    
 
     if(storage!=0){
         storage=(storage/1024);
         if(storage>currentPlan.storage){
-            return {limitExceeded:true,message:"Storage limit exceeded "+currentPlan.storage+"(GB) for "+currentPlan.planName};
+            return {appId:appId,limitExceeded:true,message:"Storage limit exceeded "+currentPlan.storage+"(GB) for "+currentPlan.planName};
         }
     }    
 
-    return {limitExceeded:false,message:"Okay"};
+    return {appId:appId,limitExceeded:false,message:"Okay"};
+}
+
+function _check80Percentage(host,appId,planId,apiCalls,storage){
+
+    var exceeded80=[];    
+
+    var currentPlan=_.first(_.where(pricingPlans.plans, {id: planId}));
+    var per80=(80/100);      
+
+    if(apiCalls!=0){
+        var apiCalls80Per=(currentPlan.apiCalls*per80);
+        if(apiCalls>apiCalls80Per){
+            var response={}
+            response.over80=true;
+            response.feature="API Calls";
+            response.message="API calls over 80 percetnage of "+currentPlan.apiCalls+" of "+currentPlan.planName;
+            exceeded80.push(response);
+        }        
+    }    
+
+    if(storage!=0){
+        storage=(storage/1024);
+
+        var storage80Per=(currentPlan.storage*per80);
+        if(storage>storage80Per){            
+            var response={}
+            response.over80=true;
+            response.feature="Storage";
+            response.message="Storage over 80 percetnage of "+currentPlan.storage+" of "+currentPlan.planName;
+            exceeded80.push(response);
+        }
+    }
+
+    if(exceeded80 && exceeded80.length>0 && global.keys.hostedSecureKey==host){
+
+        global.notificationService.findByMonth(host,appId,"over80",new Date()).then(function(notifyDoc){
+
+            if(!notifyDoc){
+                return _notifyFrontendOver80(host,appId,exceeded80);
+            }else{
+                var defaultDeffred= q.defer();
+                defaultDeffred.resolve(null);
+                return defaultDeffred.promise;
+            }
+
+        }).then(function(resp){
+            if(resp){
+                global.notificationService.insertOne(host,appId,"over80");
+            }
+            
+        },function(error){
+            console.log(error);
+        });
+    }
+   
+}
+
+function _processNotifyFrontendOver100(host,appId,planId,details){
+    if(global.keys.hostedSecureKey==host){
+
+        global.notificationService.findByMonth(host,appId,"over100",new Date()).then(function(notifyDoc){
+
+            if(!notifyDoc){
+                return _notifyFrontendOver100(host,appId,details);
+            }else{
+                var defaultDeffred= q.defer();
+                defaultDeffred.resolve(null);
+                return defaultDeffred.promise;
+            }
+
+        }).then(function(resp){
+            if(resp){
+                global.notificationService.insertOne(host,appId,"over100");
+            }
+            
+        },function(error){
+            console.log(error);
+        });
+    }
+}
+
+function _notifyFrontendOver80(host,appId,exceeded80){
+  var deferred = q.defer();
+ 
+  var post_data = {};  
+  post_data.exceeded80 = exceeded80;
+  post_data.secureKey = host;
+  post_data = JSON.stringify(post_data);
+
+
+  var url = global.keys.frontendServiceUrl + '/'+appId+'/notifications/over80';  
+
+  request.post(url,{
+      headers: {
+          'content-type': 'application/json',
+          'content-length': post_data.length
+      },
+      body: post_data
+  },function(err,response,body){
+    
+      if(err || response.statusCode === 500 || response.statusCode === 400 || body === 'Error'){       
+        deferred.reject(err);
+      }else {    
+        var respBody=JSON.parse(body);                           
+        deferred.resolve(respBody);
+      }
+  });
+
+  return deferred.promise;
+}
+
+function _notifyFrontendOver100(host,appId,details){
+  var deferred = q.defer();
+ 
+  var post_data = {};  
+  post_data.details = details;
+  post_data.secureKey = host;
+  post_data = JSON.stringify(post_data);
+
+
+  var url = global.keys.frontendServiceUrl + '/'+appId+'/notifications/over100';  
+
+  request.post(url,{
+      headers: {
+          'content-type': 'application/json',
+          'content-length': post_data.length
+      },
+      body: post_data
+  },function(err,response,body){
+    
+      if(err || response.statusCode === 500 || response.statusCode === 400 || body === 'Error'){       
+        deferred.reject(err);
+      }else {    
+        var respBody=JSON.parse(body);                           
+        deferred.resolve(respBody);
+      }
+  });
+
+  return deferred.promise;
 }

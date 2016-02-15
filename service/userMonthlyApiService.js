@@ -124,9 +124,16 @@ module.exports = {
             if(err) {                               
                 deferred.reject(err);
             }else if(doc){
+                if(doc.host){
+                    delete doc.host;
+                }
                 deferred.resolve(doc);                
             }else{
-                deferred.resolve(null);
+                var defaultResp={                    
+                    appId:appId,
+                    monthlyApiCount:0                    
+                };
+                deferred.resolve(defaultResp);
             }
         });
         

@@ -20,7 +20,7 @@ module.exports = {
                 return _self.updateByDay(host,appId,new Date(),updateJson);
             }else{
                 var docJson={
-                    secureKey:host,
+                    host:host,
                     appId:appId,
                     dayApiCount:1,
                     timeStamp: new Date().getTime()
@@ -125,7 +125,7 @@ module.exports = {
                 deferred.reject(err);
             }else if(docs && docs.length>0){
                 deferred.resolve(_prepareResponse(docs));                
-            }else{
+            }else{                
                 deferred.resolve(null);
             }
         });
@@ -140,7 +140,8 @@ function _prepareResponse(dayCountList) {
     
     var totalApiCount=0;
     for(var i=0;i<dayCountList.length;++i){
-        totalApiCount=totalApiCount+parseInt(dayCountList[i].dayApiCount)
+        totalApiCount=totalApiCount+parseInt(dayCountList[i].dayApiCount);
+        delete dayCountList[i].host;
     }  
    
     var response={                     

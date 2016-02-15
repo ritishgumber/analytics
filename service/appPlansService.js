@@ -67,6 +67,22 @@ module.exports ={
         });
         
         return deferred.promise;
+    },
+    updatePlanId:function(host,appId,newPlanId){
+        
+        var deferred= q.defer();
+        
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace);
+
+        collection.findOneAndUpdate({host:host,appId:appId}, {$set: {planId:newPlanId}}, {returnOriginal: false, upsert: true}, function(err, doc) {
+            if(err) {                
+                deferred.reject(err);
+            }else{                
+                deferred.resolve(doc);
+            } 
+        });
+
+        return deferred.promise;
     }
 };
 
