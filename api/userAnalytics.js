@@ -106,5 +106,37 @@ module.exports = function() {
         }
 
     });
+
+
+    //get monthly User Analytics by Array of APPIDs
+    global.app.post('/bulk/api-storage/count',function(req,res){
+
+        var data = req.body || {};              
+
+        if(data.secureKey && global.keys.hostedSecureKey==data.secureKey){
+            var promises=[];
+
+            promises.push(global.userMonthlyApiService.bulkMonthlyApi(data.secureKey,data.appIdArray,null));
+            promises.push(global.userStorageAnalyticsService.bulkLastDayRecords(data.secureKey,data.appIdArray));
+
+
+            q.all(promises).then(function(list){  
+                var respObj={
+                    api:list[0],
+                    storage:list[1]
+                };              
+               return res.status(200).json(respObj);
+            }, function(error){ 
+                console.log("Error in getting bulk(appIds array) api-storage count");
+                console.log(error);          
+                return res.status(400).send(error);
+            });
+
+        }else{
+            console.log("Not a valid secureKey");                       
+            return res.status(400).send("Unauthorized-Not a valid secureKey");
+        }
+
+    });
     
 };

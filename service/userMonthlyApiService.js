@@ -1,3 +1,4 @@
+var _ = require('underscore');
 
 module.exports = {
     
@@ -134,6 +135,98 @@ module.exports = {
                     monthlyApiCount:0                    
                 };
                 deferred.resolve(defaultResp);
+            }
+        });
+        
+        return deferred.promise;
+    },
+    bulkMonthlyApi : function(host,appIdArray,fromTime){
+        
+        var deferred= q.defer();
+        
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.userMonthlyApiNamespace);
+        
+        if(!fromTime){  
+            //Start from everymonth 1st    
+            var fromTime = new Date();
+            fromTime.setDate(0);
+            fromTime.setHours(0,0,0,0);           
+            fromTime=fromTime.getTime();
+        }             
+      
+        collection.find({host:host,appId:{ $in: appIdArray },timeStamp: {$gte: fromTime}}).toArray(function(err,docs){
+            if(err) { 
+
+                var response=[];
+                if(appIdArray && appIdArray.length>0){
+                    for(var i=0;i<appIdArray.length;++i){
+                        var defaultResp={                    
+                            appId:appIdArray[i],
+                            error:"Unable to get the data"                    
+                        };
+                        response.push(defaultResp);
+                    }
+                }else{
+                    var defaultResp={  
+                        message:"Empty appId array",                    
+                        error:"Unable to get the data"                    
+                    };
+                    response.push(defaultResp);
+                }
+                
+
+                deferred.reject(response);
+            }else if(docs && docs.length){
+
+                var response=[];
+
+                //delete host
+                for(var i=0;i<docs.length;++i){
+                    if(docs[i].host){
+                        delete docs[i].host;
+                    }
+                    response.push(docs[i]);
+                }
+                
+
+                for(var i=0;i<appIdArray.length;++i){
+
+                    var foundDoc=_.find(docs, function(eachDoc){
+                        if(eachDoc.appId==appIdArray[i]){
+                            return true;
+                        }
+                    });
+
+                    if(!foundDoc){
+                        var defaultResp={                    
+                            appId:appIdArray[i],
+                            monthlyApiCount:0                    
+                        };
+                        response.push(defaultResp);
+                    }
+                   
+                }                
+                
+                deferred.resolve(response);                
+            }else{
+
+                var response=[];
+                if(appIdArray && appIdArray.length>0){
+                    for(var i=0;i<appIdArray.length;++i){
+                        var defaultResp={                    
+                            appId:appIdArray[i],
+                            monthlyApiCount:0                    
+                        };
+                        response.push(defaultResp);
+                    }
+                }else{
+                    var defaultResp={                      
+                        message:"Empty appId array"                    
+                    };
+                    response.push(defaultResp);
+                }
+                
+                deferred.resolve(response);
             }
         });
         

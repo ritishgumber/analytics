@@ -1,3 +1,5 @@
+var _ = require('underscore');
+
 module.exports ={
 
    
@@ -103,6 +105,101 @@ module.exports ={
             }
         },function(error){
             deferred.reject(error);
+        });
+        
+        return deferred.promise;
+    },
+    bulkLastDayRecords : function(host,appIdArray){
+        
+        var deferred= q.defer();
+      
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.userStorageAnalyticsNamespace);
+        
+        var pipeline = [];
+         
+        var query = {};
+        query.host=host;
+        query.appId={};
+        query.appId.$in=appIdArray;
+        pipeline.push({$match:query});          
+
+        var group={$group:{"_id":"$appId", "timeStamp":{$max:"$timeStamp"}, size: { $last: "$size" } }};     
+        pipeline.push(group);               
+
+        collection.aggregate(pipeline, function(err,docs){
+            if(err) {                
+                var response=[];
+                if(appIdArray && appIdArray.length>0){
+                    for(var i=0;i<appIdArray.length;++i){
+                        var defaultResp={                    
+                            appId:appIdArray[i],
+                            error:"Unable to get the data"                    
+                        };
+                        response.push(defaultResp);
+                    }
+                }else{
+                    var defaultResp={  
+                        message:"Empty appId array",                    
+                        error:"Unable to get the data"                    
+                    };
+                    response.push(defaultResp);
+                }                
+
+                deferred.reject(response);
+
+            }else if(docs && docs.length>0){  
+
+                var response=[];                
+                
+                for(var i=0;i<docs.length;++i){
+
+                    var defaultResp={                    
+                        appId:docs[i]._id,
+                        size:docs[i].size,
+                        timeStamp:docs[i].timeStamp                    
+                    };                       
+                    response.push(defaultResp);
+                }
+
+                for(var i=0;i<appIdArray.length;++i){
+
+                    var foundDoc=_.find(docs, function(eachDoc){
+                        if(eachDoc._id==appIdArray[i]){
+                            return true;
+                        }
+                    });
+
+                    if(!foundDoc){
+                        var defaultResp={                    
+                            appId:appIdArray[i],
+                            size:0                    
+                        };
+                        response.push(defaultResp);
+                    }
+                   
+                }
+                deferred.resolve(response);
+
+            }else{
+
+                var response=[];
+                if(appIdArray && appIdArray.length>0){
+                    for(var i=0;i<appIdArray.length;++i){
+                        var defaultResp={                    
+                            appId:appIdArray[i],
+                            size:0                    
+                        };
+                        response.push(defaultResp);
+                    }
+                }else{
+                    var defaultResp={                      
+                        message:"Empty appId array"                    
+                    };
+                    response.push(defaultResp);
+                }
+                
+                deferred.resolve(response);
+            }
         });
         
         return deferred.promise;

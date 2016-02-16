@@ -189,7 +189,7 @@ module.exports = {
                 query.timestamp.$lt = Number(toTime);
             }
 
-             if(sdk)
+            if(sdk)
                 query.sdk = sdk;
         }
         

@@ -27,7 +27,6 @@ if(global.isDevelopment){
     global.keys.frontendServiceUrl="http://localhost:3000";   
 }
 
-
 var app = require('./app')();
 app.set('port', process.env.PORT || 5555);
 var server = app.listen(app.get('port'), function(){
