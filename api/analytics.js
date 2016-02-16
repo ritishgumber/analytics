@@ -15,7 +15,7 @@ module.exports = function() {
 
                 if(keyObj){
                     global.analyticsService.store(host,appId, category, subCategory,sdk).then(function(resp){
-                        res.status(200).json(resp);
+                        res.status(200).json(resp);                        
                     },function(error){
                         res.status(400).send(error);
                     });
@@ -98,6 +98,36 @@ module.exports = function() {
             }, function(error){
                 res.status(500).send(error);
             });
+        
+    });
+
+    //App Released
+    global.app.post('/app/isReleased',function(req,res){                 
+           
+        var appId = req.body.appId;
+        var host = req.body.host;        
+
+        if(appId && host){
+            host=host.trim();      
+            global.serverService.findKey(host).then(function(keyObj){
+
+                if(keyObj){
+                    global.analyticsService.isAppReleased(host,appId).then(function(resp){
+                        res.status(200).send(resp);                        
+                    },function(error){
+                        res.status(400).send(error);
+                    });
+                }else{
+                    res.status(401).send("SecureKey not matched-Unauthorized");
+                }                
+
+            },function(error){
+                res.status(401).send("Not a valid secureKey-Unauthorized");
+            });
+        }else{
+            res.status(400).send("AppId and Host is required");
+        }
+                                
         
     });
     

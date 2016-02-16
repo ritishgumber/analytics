@@ -127,8 +127,7 @@ module.exports = function() {
                 };              
                return res.status(200).json(respObj);
             }, function(error){ 
-                console.log("Error in getting bulk(appIds array) api-storage count");
-                console.log(error);          
+                console.log("Error in getting bulk(appIds array) api-storage count");                         
                 return res.status(400).send(error);
             });
 

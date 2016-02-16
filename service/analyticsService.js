@@ -42,7 +42,7 @@ module.exports = {
                     console.log("App Check Limit error");
                     console.log(error);
                     
-                    deferred.resolve({appId:appId,limitExceeded:false,message:"Okay"});
+                    deferred.resolve({appId:appId,limitExceeded:false,message:"Error in computing whole process"});
                 });              
             }
         });
@@ -339,6 +339,51 @@ module.exports = {
         });
         
         return deferred.promise;
+    },
+    isAppReleased : function(host,appId){
+        
+        var deferred= q.defer(); 
+        
+        global.appPlansService.findAppPlan(host,appId).then(function(appPlanDoc){         
+         
+            if(appPlanDoc){
+
+                var promises=[];
+
+                //API calls 
+                promises.push(global.userMonthlyApiService.monthlyApiByAppId(appPlanDoc.host,appPlanDoc.appId,null));
+                //Storage 
+                promises.push(global.userStorageAnalyticsService.monthlyAnalyticsByAppId(appPlanDoc.host,appPlanDoc.appId,null));
+
+                q.all(promises).then(function(list){ 
+                    var apiCalls=0;
+                    var storage=0;            
+
+                    if(list[0] && list[0].monthlyApiCount){
+                        apiCalls=list[0].monthlyApiCount;
+                    }
+                    if(list[1] && list[1].totalStorage){
+                        storage=list[1].totalStorage;
+                    }
+
+                    var over100Doc= _check100Percentage(appPlanDoc.appId,appPlanDoc.planId,apiCalls,storage);
+                   
+                    deferred.resolve(over100Doc);         
+                                             
+
+                }, function(err){    
+                    deferred.resolve({appId:appId,limitExceeded:false,message:"Error in getting usage details"});
+                }); 
+            }else{
+                deferred.resolve({appId:appId,limitExceeded:false,message:"PlanId not found"});
+            }
+            
+
+        },function(error){
+            deferred.resolve({appId:appId,limitExceeded:false,message:"Error in getting plan details"});
+        });
+
+        return deferred.promise;
     }  
     
        
@@ -383,12 +428,12 @@ function _checkAppLimit(host,appId){
             }                         
 
         }, function(err){    
-            deferred.resolve(err);
+            deferred.reject(err);
         });
 
 
     },function(error){
-        deferred.resolve(error);
+        deferred.reject(error);
     });
 
     return deferred.promise;
