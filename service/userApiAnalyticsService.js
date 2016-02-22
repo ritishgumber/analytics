@@ -53,7 +53,7 @@ module.exports = {
        
         return deferred.promise;
     },
-    findByDay : function(secureKey,appId,dateObj){
+    findByDay : function(host,appId,dateObj){
         
         
         var deferred= q.defer();
@@ -69,7 +69,7 @@ module.exports = {
         endDay=endDay.getTime();     
 
 
-        collection.findOne({secureKey:secureKey,appId:appId, timeStamp: {$gte: startDay, $lt: endDay}      
+        collection.findOne({host:host,appId:appId, timeStamp: {$gte: startDay, $lt: endDay}      
         },function(err,doc){
             if(err) {                
                 deferred.reject(err);
@@ -80,7 +80,7 @@ module.exports = {
         
         return deferred.promise;
     },
-    updateByDay : function(secureKey,appId,dateObj,newJson){
+    updateByDay : function(host,appId,dateObj,newJson){
         
         var deferred= q.defer();
         
@@ -94,7 +94,7 @@ module.exports = {
         endDay.setHours(23,59,59,0);
         endDay=endDay.getTime(); 
             
-        collection.findOneAndUpdate({secureKey:secureKey,appId:appId,timeStamp: {$gte: startDay, $lt: endDay}
+        collection.findOneAndUpdate({host:host,appId:appId,timeStamp: {$gte: startDay, $lt: endDay}
         },{$set:newJson},{upsert: true,returnOriginal:false},function(err,docList){
             if(err) {               
                 deferred.reject(err);
@@ -106,7 +106,7 @@ module.exports = {
         return deferred.promise;
     },
 
-    monthlyAnalyticsByAppId : function(secureKey,appId,fromTime){
+    monthlyAnalyticsByAppId : function(host,appId,fromTime){
         
         var deferred= q.defer();
         
@@ -120,7 +120,7 @@ module.exports = {
             fromTime=fromTime.getTime();
         }             
       
-        collection.find({secureKey:secureKey,appId:appId,timeStamp: {$gte: fromTime}}).toArray(function(err,docs){
+        collection.find({host:host,appId:appId,timeStamp: {$gte: fromTime}}).toArray(function(err,docs){
             if(err) {                               
                 deferred.reject(err);
             }else if(docs && docs.length>0){

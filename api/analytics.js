@@ -106,7 +106,7 @@ module.exports = function() {
            
         var appId = req.body.appId;
         var host = req.body.host;        
-
+        
         if(appId && host){
             host=host.trim();      
             global.serverService.findKey(host).then(function(keyObj){

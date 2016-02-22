@@ -441,7 +441,7 @@ function _checkAppLimit(host,appId){
 
 function _check100Percentage(appId,planId,apiCalls,storage){    
     var currentPlan=_.first(_.where(pricingPlans.plans, {id: planId}));   
-   
+    
     if(apiCalls!=0){       
         if(apiCalls>currentPlan.apiCalls){
             return {appId:appId,limitExceeded:true,message:"API Calls limit exceeded "+currentPlan.apiCalls+" for "+currentPlan.planName};
@@ -516,9 +516,8 @@ function _check80Percentage(host,appId,planId,apiCalls,storage){
 function _processNotifyFrontendOver100(host,appId,planId,details){
     if(global.keys.hostedSecureKey==host){
 
-        global.notificationService.findByMonth(host,appId,"over100",new Date()).then(function(notifyDoc){
-
-            if(!notifyDoc){
+        global.notificationService.findByMonth(host,appId,"over100",new Date()).then(function(notifyDoc){            
+            if(!notifyDoc){               
                 return _notifyFrontendOver100(host,appId,details);
             }else{
                 var defaultDeffred= q.defer();
@@ -585,7 +584,6 @@ function _notifyFrontendOver100(host,appId,details){
       },
       body: post_data
   },function(err,response,body){
-    
       if(err || response.statusCode === 500 || response.statusCode === 400 || body === 'Error'){       
         deferred.reject(err);
       }else {    
