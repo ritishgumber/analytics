@@ -2,10 +2,7 @@ module.exports = function() {
 
     //Save the API request to the database.
     global.app.post('/api/store',function(req,res){
-        console.log("REQUEST RECEIVED");
-        console.log(req.body.host);
-        console.log(req.body.appId);
-        console.log(req.body.category);
+       
         if(_validate(req,res)){
             
             var category = req.body.category;

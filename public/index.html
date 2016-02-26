@@ -183,6 +183,43 @@
             </div> <!-- //end cf-item -->
             
 		</div> <!-- //end row -->
+
+
+        <!--ROW-->
+        <div class="row">
+            <div class="col-sm-3 cf-item">
+                <header>
+                    <p><span></span>TOTAL APPS(5000) </p>
+                </header>
+                <div class="content">
+                    <div class="cf-svmc">
+                        <div class="metric" id="app5000">-</div>
+                    </div>
+                </div>
+            </div> <!-- //end cf-item -->
+            
+            <div class="col-sm-3 cf-item">
+                <header>
+                    <p><span></span>TOTAL APPS(10000) </p>
+                </header>
+                <div class="content">
+                    <div class="cf-svmc-sparkline">
+                        <div class="cf-svmc">
+                            <div class="metric" id="app10000">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 cf-item">
+                <header>
+                    <p><span></span>TOTAL APPS(15000) </p>
+                </header>
+                <div class="content">
+                    <div class="metric" id="app15000">-</div>
+                </div>
+            </div> <!-- //end cf-item -->
+            
+        </div> <!-- //end row -->
 	
 		
 	</div> <!-- //end container -->
@@ -546,7 +583,49 @@
                 }
             });
         });
+
+
+        //Get Total number of apps which crossed 5000 calls.
+        $(document).ready(function(){
+            $.ajax({
+                url: url+"api/5000",                
+                type: "GET",
+                success: function(response){
+                    $("#app5000").text(response);
+                },
+                error: function(response){
+                    console.log(response);
+                }
+            });
+        });
         
+        //Get Total number of apps which crossed 10000 calls.
+        $(document).ready(function(){
+            $.ajax({
+                url: url+"api/10000",                
+                type: "GET",
+                success: function(response){
+                    $("#app10000").text(response);
+                },
+                error: function(response){
+                    console.log(response);
+                }
+            });
+        });
+
+        //Get Total number of apps which crossed 15000 calls.
+        $(document).ready(function(){
+            $.ajax({
+                url: url+"api/15000",                
+                type: "GET",
+                success: function(response){
+                   $("#app15000").text(response); 
+                },
+                error: function(response){
+                    console.log(response);
+                }
+            });
+        });
     </script>
 
 </body>

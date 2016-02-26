@@ -81,6 +81,40 @@ module.exports = {
         
         return deferred.promise;
     },
+    countAppsByCallByMonth : function(dateObj,noCalls){
+        
+        
+        var deferred= q.defer();
+        
+        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.userMonthlyApiNamespace);          
+
+        if(!dateObj){
+           dateObj=new Date(); 
+        }
+
+        var startDay=dateObj;
+        startDay.setDate(1); 
+        startDay.setHours(0,0,0,0); 
+        startDay=startDay.getTime();          
+        
+        var endDay=dateObj;
+        endDay=new Date(endDay.getFullYear(), endDay.getMonth() + 1, 0, 23, 59, 59); 
+        endDay=endDay.getTime(); 
+
+
+        noCalls=parseInt(noCalls);
+
+        collection.count({monthlyApiCount:{$gte:noCalls}, timeStamp: {$gte: startDay, $lt: endDay}      
+        },function(err,count){
+            if(err) {                
+                deferred.reject(err);
+            }else{                
+                deferred.resolve(count);
+            }
+        });
+        
+        return deferred.promise;
+    },
     updateByMonth : function(host,appId,dateObj,newJson){
         
         var deferred= q.defer();
