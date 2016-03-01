@@ -6,18 +6,24 @@ module.exports = function() {
         var data = req.body || {}; 
         var appId=req.params.appId;        
        
-        if(data.secureKey && global.keys.hostedSecureKey==data.secureKey){
-            global.userStorageAnalyticsService.addRecords(data.secureKey,data.dbArray).then(function(result){
-               return res.status(200).json(result);
-            }, function(error){
-                console.log("Error in saving Storage");
-                console.log(error);           
-                return res.status(400).send(error);
-            });
-        }else{ 
-            console.log("Not a valid secureKey");                       
-            return res.status(400).send("Unauthorized-Not a valid secureKey");
-        }
+        global.serverService.findKey(data.secureKey).then(function(keyObj){
+
+            if(keyObj){
+                global.userStorageAnalyticsService.addRecords(data.secureKey,data.dbArray).then(function(result){
+                    return res.status(200).json(result);
+                }, function(error){
+                    console.log("Error in saving Storage");
+                    console.log(error);           
+                    return res.status(400).send(error);
+                });
+            }else{ 
+                console.log("Not a valid secureKey");                       
+                return res.status(400).send("Unauthorized-Not a valid secureKey");
+            }
+
+        },function(error){
+            res.status(401).send("Unauthorized");
+        });
 
     });
 
@@ -28,18 +34,24 @@ module.exports = function() {
         var data = req.body || {};
         var appId=req.params.appId;        
 
-        if(data.secureKey && global.keys.hostedSecureKey==data.secureKey){
-	        global.userApiAnalyticsService.monthlyAnalyticsByAppId(data.secureKey,appId,null).then(function(result){                
-	           return res.status(200).json(result);
-	        }, function(error){  
-                console.log("Error in getting api usage");
-                console.log(error);          
-	            return res.status(400).send(error);
-	        });
-    	}else{
-           console.log("Not a valid secureKey");                       
-            return res.status(400).send("Unauthorized-Not a valid secureKey");
-        }
+        global.serverService.findKey(data.secureKey).then(function(keyObj){
+
+            if(keyObj){
+    	        global.userApiAnalyticsService.monthlyAnalyticsByAppId(data.secureKey,appId,null).then(function(result){                
+    	           return res.status(200).json(result);
+    	        }, function(error){  
+                    console.log("Error in getting api usage");
+                    console.log(error);          
+    	            return res.status(400).send(error);
+    	        });
+    	    }else{ 
+                console.log("Not a valid secureKey");                       
+                return res.status(400).send("Unauthorized-Not a valid secureKey");
+            }
+
+        },function(error){
+            res.status(401).send("Unauthorized");
+        });
 
     });
 
@@ -49,18 +61,24 @@ module.exports = function() {
         var data = req.body || {}; 
         var appId=req.params.appId;        
 
-        if(data.secureKey && global.keys.hostedSecureKey==data.secureKey){
-            global.userStorageAnalyticsService.monthlyAnalyticsByAppId(data.secureKey,appId,null).then(function(result){
-               return res.status(200).json(result);
-            }, function(error){  
-                console.log("Error in getting storage usage");
-                console.log(error);         
-                return res.status(400).send(error);
-            });
-        }else{
-            console.log("Not a valid secureKey");                       
-            return res.status(400).send("Unauthorized-Not a valid secureKey");
-        }
+        global.serverService.findKey(data.secureKey).then(function(keyObj){
+
+            if(keyObj){
+                global.userStorageAnalyticsService.monthlyAnalyticsByAppId(data.secureKey,appId,null).then(function(result){
+                   return res.status(200).json(result);
+                }, function(error){  
+                    console.log("Error in getting storage usage");
+                    console.log(error);         
+                    return res.status(400).send(error);
+                });
+            }else{ 
+                console.log("Not a valid secureKey");                       
+                return res.status(400).send("Unauthorized-Not a valid secureKey");
+            }
+
+        },function(error){
+            res.status(401).send("Unauthorized");
+        });
 
     });
 
@@ -71,18 +89,24 @@ module.exports = function() {
         var data = req.body || {};
         var appId=req.params.appId;        
 
-        if(data.secureKey && global.keys.hostedSecureKey==data.secureKey){
-            global.userMonthlyApiService.monthlyApiByAppId(data.secureKey,appId,null).then(function(result){                
-               return res.status(200).json(result);
-            }, function(error){ 
-                console.log("Error in getting api count");
-                console.log(error);          
-                return res.status(400).send(error);
-            });
-        }else{
-            console.log("Not a valid secureKey");                       
-            return res.status(400).send("Unauthorized-Not a valid secureKey");
-        }
+        global.serverService.findKey(data.secureKey).then(function(keyObj){
+
+            if(keyObj){
+                global.userMonthlyApiService.monthlyApiByAppId(data.secureKey,appId,null).then(function(result){                
+                   return res.status(200).json(result);
+                }, function(error){ 
+                    console.log("Error in getting api count");
+                    console.log(error);          
+                    return res.status(400).send(error);
+                });
+            }else{ 
+                console.log("Not a valid secureKey");                       
+                return res.status(400).send("Unauthorized-Not a valid secureKey");
+            }
+
+        },function(error){
+            res.status(401).send("Unauthorized");
+        });
 
     });
 
@@ -92,18 +116,24 @@ module.exports = function() {
         var data = req.body || {}; 
         var appId=req.params.appId;        
 
-        if(data.secureKey && global.keys.hostedSecureKey==data.secureKey){
-            global.userStorageAnalyticsService.lastRecordByAppId(data.secureKey,appId).then(function(result){
-               return res.status(200).json(result);
-            }, function(error){   
-                console.log("Error in getting storage count");
-                console.log(error);        
-                return res.status(400).send(error);
-            });
-        }else{
-            console.log("Not a valid secureKey");                       
-            return res.status(400).send("Unauthorized-Not a valid secureKey");
-        }
+        global.serverService.findKey(data.secureKey).then(function(keyObj){
+
+            if(keyObj){
+                global.userStorageAnalyticsService.lastRecordByAppId(data.secureKey,appId).then(function(result){
+                   return res.status(200).json(result);
+                }, function(error){   
+                    console.log("Error in getting storage count");
+                    console.log(error);        
+                    return res.status(400).send(error);
+                });
+            }else{ 
+                console.log("Not a valid secureKey");                       
+                return res.status(400).send("Unauthorized-Not a valid secureKey");
+            }
+
+        },function(error){
+            res.status(401).send("Unauthorized");
+        });
 
     });
 
@@ -113,28 +143,34 @@ module.exports = function() {
 
         var data = req.body || {};              
 
-        if(data.secureKey && global.keys.hostedSecureKey==data.secureKey){
-            var promises=[];
+        global.serverService.findKey(data.secureKey).then(function(keyObj){
 
-            promises.push(global.userMonthlyApiService.bulkMonthlyApi(data.secureKey,data.appIdArray,null));
-            promises.push(global.userStorageAnalyticsService.bulkLastDayRecords(data.secureKey,data.appIdArray));
+            if(keyObj){
+                var promises=[];
+
+                promises.push(global.userMonthlyApiService.bulkMonthlyApi(data.secureKey,data.appIdArray,null));
+                promises.push(global.userStorageAnalyticsService.bulkLastDayRecords(data.secureKey,data.appIdArray));
 
 
-            q.all(promises).then(function(list){  
-                var respObj={
-                    api:list[0],
-                    storage:list[1]
-                };              
-               return res.status(200).json(respObj);
-            }, function(error){ 
-                console.log("Error in getting bulk(appIds array) api-storage count");                         
-                return res.status(400).send(error);
-            });
+                q.all(promises).then(function(list){  
+                    var respObj={
+                        api:list[0],
+                        storage:list[1]
+                    };              
+                   return res.status(200).json(respObj);
+                }, function(error){ 
+                    console.log("Error in getting bulk(appIds array) api-storage count");                         
+                    return res.status(400).send(error);
+                });
 
-        }else{
-            console.log("Not a valid secureKey");                       
-            return res.status(400).send("Unauthorized-Not a valid secureKey");
-        }
+            }else{ 
+                console.log("Not a valid secureKey");                       
+                return res.status(400).send("Unauthorized-Not a valid secureKey");
+            }
+
+        },function(error){
+            res.status(401).send("Unauthorized");
+        });
 
     });
 

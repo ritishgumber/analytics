@@ -36,14 +36,20 @@ module.exports = {
                 global.userApiAnalyticsService.addRecord(host, appId);                 
                 global.userMonthlyApiService.addRecord(host, appId);
 
-                _checkAppLimit(host,appId).then(function(response){
-                    deferred.resolve(response);
-                },function(error){
-                    console.log("App Check Limit error");
-                    console.log(error);
-                    
-                    deferred.resolve({appId:appId,limitExceeded:false,message:"Error in computing whole process"});
-                });              
+                //isHosted
+                if(host==global.keys.hostedSecureKey){
+                   _checkAppLimit(host,appId).then(function(response){
+                        deferred.resolve(response);
+                    },function(error){
+                        console.log("App Check Limit error");
+                        console.log(error);
+                        
+                        deferred.resolve({appId:appId,limitExceeded:false,message:"Error in computing whole process"});
+                    }); 
+                }else{
+                    deferred.resolve({appId:appId,limitExceeded:false,message:"Not a Hosted Services"});
+                }
+                              
             }
         });
         

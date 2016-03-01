@@ -91,14 +91,14 @@ module.exports = function() {
     //Get apps which are active.
     global.app.post('/category/api',function(req,res){
        
-            var fromTime = req.body.fromTime;
-            var toTime = req.body.toTime; 
-            var sdk = req.body.sdk;
-            global.analyticsService.categoryWithApiCount(fromTime, toTime,sdk).then(function(result){
-                res.status(200).json(result);
-            }, function(error){
-                res.status(500).send(error);
-            });
+        var fromTime = req.body.fromTime;
+        var toTime = req.body.toTime; 
+        var sdk = req.body.sdk;
+        global.analyticsService.categoryWithApiCount(fromTime, toTime,sdk).then(function(result){
+            res.status(200).json(result);
+        }, function(error){
+            res.status(500).send(error);
+        });
         
     });
 
