@@ -34,11 +34,13 @@ module.exports = function() {
     global.app.post('/api/count',function(req,res){
         var category = req.body.category;
         var subCategory = req.body.subCategory;
-        var appId = req.body.appId;
-        var host = req.body.host;
+        var appId = req.body.appId;        
         var fromTime = req.body.fromTime;
         var toTime = req.body.toTime;
+
+        var host = req.body.host;
         var sdk = req.body.sdk;
+
         global.analyticsService.totalApiCount(host, appId, category, subCategory, fromTime, toTime,sdk).then(function(result){
             res.status(200).json({count : result});
         }, function(error){
@@ -51,8 +53,11 @@ module.exports = function() {
             var fromTime = req.body.fromTime;
             var toTime = req.body.toTime;
             var apiRequests = req.body.apiCount || 500;
+
+            var host = req.body.host;
             var sdk = req.body.sdk;
-            global.analyticsService.funnelAppCount(fromTime, toTime,apiRequests,sdk).then(function(result){
+
+            global.analyticsService.funnelAppCount(fromTime, toTime,apiRequests,sdk,host).then(function(result){
                 res.status(200).json({count : result});
             }, function(error){
                 res.status(500).send(error);
@@ -63,8 +68,11 @@ module.exports = function() {
     global.app.post('/app/active/count',function(req,res){
             var fromTime = req.body.fromTime;
             var toTime = req.body.toTime;
+
+            var host = req.body.host;
             var sdk = req.body.sdk;
-            global.analyticsService.activeAppCount(fromTime, toTime,sdk).then(function(result){
+
+            global.analyticsService.activeAppCount(fromTime, toTime,sdk,host).then(function(result){
                 res.status(200).json({count : result});
             }, function(error){
                 res.status(500).send(error);
@@ -79,8 +87,11 @@ module.exports = function() {
             var toTime = req.body.toTime;
             var limit = req.body.limit;
             var skip = req.body.skip;
+
+            var host = req.body.host;
             var sdk = req.body.sdk;
-            global.analyticsService.activeAppWithAPICount(fromTime, toTime, limit, skip,sdk).then(function(result){
+
+            global.analyticsService.activeAppWithAPICount(fromTime, toTime, limit, skip,sdk,host).then(function(result){
                 res.status(200).json(result);
             }, function(error){
                 res.status(500).send(error);
@@ -92,9 +103,12 @@ module.exports = function() {
     global.app.post('/category/api',function(req,res){
        
         var fromTime = req.body.fromTime;
-        var toTime = req.body.toTime; 
+        var toTime = req.body.toTime;
+
+        var host = req.body.host; 
         var sdk = req.body.sdk;
-        global.analyticsService.categoryWithApiCount(fromTime, toTime,sdk).then(function(result){
+
+        global.analyticsService.categoryWithApiCount(fromTime, toTime,sdk,host).then(function(result){
             res.status(200).json(result);
         }, function(error){
             res.status(500).send(error);

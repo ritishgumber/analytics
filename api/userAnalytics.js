@@ -176,9 +176,14 @@ module.exports = function() {
 
 
     //get apps which crossed api calls(specified) by month
-    global.app.get('/api/:calls',function(req,res){
-       
-        var noCalls=req.params.calls;    
+    global.app.post('/api/:calls',function(req,res){
+
+        var data = req.body || {};
+
+        var noCalls=req.params.calls; 
+        var host=data.host;
+        var sdk=data.sdk;         
+
 
         global.userMonthlyApiService.countAppsByCallByMonth(null,noCalls).then(function(result){                
            return res.status(200).json(result);

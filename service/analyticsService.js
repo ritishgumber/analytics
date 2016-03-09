@@ -103,7 +103,7 @@ module.exports = {
         return deferred.promise;
     },
     
-    activeAppWithAPICount : function(fromTime, toTime, limit, skip, sdk){
+    activeAppWithAPICount : function(fromTime, toTime, limit, skip, sdk,host){
         
         var deferred= q.defer();
         
@@ -125,6 +125,9 @@ module.exports = {
             
             if(sdk)
                 query.sdk = sdk;
+
+            if(host)
+                query.host = host;
             pipeline.push({$match:query});
         }
         
@@ -175,7 +178,7 @@ module.exports = {
         return deferred.promise;
     },
     
-    activeAppCount : function(fromTime, toTime,sdk){
+    activeAppCount : function(fromTime, toTime,sdk,host){
         
         var deferred= q.defer();
         
@@ -197,6 +200,9 @@ module.exports = {
 
             if(sdk)
                 query.sdk = sdk;
+
+            if(host)
+                query.host = host;
         }
         
         collection.distinct("appId", query, function(err,docs){
@@ -213,7 +219,7 @@ module.exports = {
         return deferred.promise;
     },
 
-    funnelAppCount : function(fromTime, toTime,apiCount,sdk){
+    funnelAppCount : function(fromTime, toTime,apiCount,sdk,host){
         
         var deferred= q.defer();
         
@@ -237,6 +243,9 @@ module.exports = {
 
             if(sdk)
                query.sdk = sdk;
+
+            if(host)
+               query.host = host;
 
             pipeline.push({$match : query});
         }
@@ -271,7 +280,7 @@ module.exports = {
         return deferred.promise;
     },
     
-    categoryWithApiCount : function(fromTime, toTime, sdk){
+    categoryWithApiCount : function(fromTime, toTime, sdk,host){
         
         var deferred= q.defer();
         
@@ -293,6 +302,9 @@ module.exports = {
 
             if(sdk)
               query.sdk = sdk;
+
+            if(host)
+              query.host = host;
             
             pipeline.push({$match:query});
         }

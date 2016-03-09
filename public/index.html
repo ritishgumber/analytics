@@ -9,26 +9,12 @@
     <link href="../css/bootstrap.css" rel="stylesheet">
     <link href="../css/controlfrog.css" rel="stylesheet" media="screen">
 	<!--<link href="http://leapfrogui.com/controlfrog-v1.4/cf/favicon.ico" rel="shortcut icon" type="image/x-icon" />-->
-	<script src="../js/url.js"></script>
-	<script src="../js/jquery-1.9.1.min.js"></script>
-	<script src="../js/moment.js"></script>
-	<script src="../js/easypiechart.js"></script>
-	<script src="../js/gauge.js"></script>
-	<script src="../js/chart.js"></script>
-	<script src="../js/jquery.sparklines.js"></script>
-    <script src="../js/bootstrap.js"></script>
-    <script src="../js/controlfrog-plugins.js"></script>
     
     <!--[if lt IE 9]>
 		<script src="../js/respond.min.js"></script>
 		<script src="../js/excanvas.min.js"></script>
-	<![endif]-->
-    
-    
-	<script>
-		var themeColour = 'white';
-	</script>
-    <script src="../js/controlfrog.js"></script>
+	<![endif]-->  
+	
 </head>
 <body class="black">
 	
@@ -224,408 +210,465 @@
 		
 	</div> <!-- //end container -->
 
+    <script src="../js/url.js"></script>
+    <script src="../js/jquery-1.9.1.min.js"></script>
+    <script src="../js/moment.js"></script>
+    <script src="../js/easypiechart.js"></script>
+    <script src="../js/gauge.js"></script>
+    <script src="../js/chart.js"></script>
+    <script src="../js/jquery.sparklines.js"></script>
+    <script src="../js/bootstrap.js"></script>
+    <script src="../js/controlfrog-plugins.js"></script>
+    <script src="../js/query-string.js"></script>
     <script>
+        var themeColour = 'white';
+    </script>
+    <script src="../js/controlfrog.js"></script>
 
-    //This is the fucntion to get querysting, 
+    <script>
+   
+   //This is the fucntion to get querysting, 
     function getParameterByName(name) {
         name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
         var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
             results = regex.exec(location.search);
         return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }    
+    
+    var requestedHost=null;
+    var requestedSdk=null;
+    $(document).ready(function(){
+
+        requestedHost = $.query.get('host');
+        requestedSdk = $.query.get('sdk');
+
+        if(!requestedHost)
+            requestedHost=getParameterByName('host');
+
+        if(!requestedSdk)
+            requestedSdk=getParameterByName('sdk');       
+
+        //getApiCount
+        getApiCount(requestedHost,requestedSdk);
+        //getActiveApps
+        getActiveApps(requestedHost,requestedSdk);
+        //getTopActiveAppsApiCount
+        getTopActiveAppsApiCount(requestedHost,requestedSdk);
+        //getTopActiveAppsApiFunnelCount
+        getTopActiveAppsApiFunnelCount(requestedHost,requestedSdk);
+        //getCategoryCount
+        getCategoryCount(requestedHost,requestedSdk);
+        //getLastWeekApiCount
+        getLastWeekApiCount(requestedHost,requestedSdk);
+        //getLastWeekApiFunnelCount
+        getLastWeekApiFunnelCount(requestedHost,requestedSdk);
+        //getLastActiveAppsCount
+        getLastActiveAppsCount(requestedHost,requestedSdk);
+        //apps5000
+        apps5000(requestedHost,requestedSdk);
+        //apps10000
+        apps10000(requestedHost,requestedSdk);
+        //apps15000
+        apps15000(requestedHost,requestedSdk);        
+    });
+
+    
+    //load total API count.
+    function getApiCount(requestedHost,requestedSdk){       
+
+        var data = {};
+        data.host = requestedHost;
+        data.sdk = requestedSdk;
+
+        $.ajax({
+            url: url+"api/count",
+            data: data,
+            type: "POST",
+            success: function(response){
+                var count = response.count;
+                $("#apiCount").text(addCommas(count));
+            },
+            error: function(response){
+                console.log(response);
+            }
+        });
     }
-        //load total API count.
-        $(document).ready(function(){
-            var apiCount = 0;
-
-            var data = {};
-
-            var sdk = getParameterByName('sdk');
-
-            if(sdk)
-                data.sdk = sdk;
-
-            $.ajax({
-                url: url+"api/count",
-                data: data,
-                type: "POST",
-                success: function(response){
-                    var count = response.count;
-                    $("#apiCount").text(addCommas(count));
-                },
-                error: function(response){
-                    console.log(response);
-                }
-            });
-        });
+    
+    //Get top active apps with API count.
+    function getActiveApps(requestedHost,requestedSdk){
+    
+        var apiCount = 0;
         
-        //Get top active apps with API count.
-        $(document).ready(function(){
-            var apiCount = 0;
-            
-            var aWeekAgo = new Date();
-            var numberOfDays = 7;
-            aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
+        var aWeekAgo = new Date();
+        var numberOfDays = 7;
+        aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
 
-            var data = {"fromTime":aWeekAgo.getTime(),
-                       "toTime" : new Date().getTime(),
-                        "limit" : 5};
+        var data = {"fromTime":aWeekAgo.getTime(),
+                   "toTime" : new Date().getTime(),
+                    "limit" : 5};
 
-            var sdk = getParameterByName('sdk');
-
-            if(sdk)
-                data.sdk = sdk;
-            
-            $.ajax({
-                url: url+"app/active",
-                data: data,
-                type: "POST",
-                success: function(response){
-                   var text ="";
-                   
-                   response.sort(function(a,b){return b.apiCount-a.apiCount});
-                    console.log(response);
-                    var funData =[];
-                    var funLabels = [];
-                    var funOptions = [];
-                    $('.cf-funnel').each(function(){
-                        for(var i=0;i<response.length;i++) {
-                            funData.push(response[i].apiCount);
-                            funLabels.push(response[i].appId);
-                            funOptions = {barOpacity: true};
-                        }
-
-                        cf_rFunnels[$(this).prop('id')] = new FunnelChart($(this).prop('id'), funData, funLabels, funOptions);
-                    });
-                   
-                },
-                error: function(response){
-                    console.log(response);
-                }
-            });
-        });
-
-//Get top active apps with API count.
-        $(document).ready(function(){
-
-            var data = {};
-
-            var sdk = getParameterByName('sdk');
-
-            if(sdk)
-                data.sdk = sdk;
-
-            $.ajax({
-                url: url+"app/active/count",
-                data: data,
-                type: "POST",
-                success: function(response){
-                    var count = response.count;
-                    $("#totalApps").text(addCommas(count));
-                },
-                error: function(response){
-                    console.log(response);
-                }
-            });
-        });
-
-        //Get top active apps with API count.
-        $(document).ready(function(){
-
-            var data = {};
-
-            var sdk = getParameterByName('sdk');
-
-            if(sdk)
-                data.sdk = sdk;
-
-            $.ajax({
-                url: url+"app/funnel/count",
-                data: data,
-                type: "POST",
-                success: function(response){
-                    var count = response.count;
-                    $("#funnelCount").text(addCommas(count));
-                },
-                error: function(response){
-                    console.log(response);
-                }
-            });
-        });
+        data.host = requestedHost;
+        data.sdk = requestedSdk;
         
-        
-        //Get category count.
-        $(document).ready(function(){
-            var apiCount = 0;
-
-             var aWeekAgo = new Date();
-            var numberOfDays = 7;
-            aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
-            
-           var data = {"fromTime":aWeekAgo.getTime(),
-                       "toTime" : new Date().getTime(),
-                        "limit" : 5};
-
-            var sdk = getParameterByName('sdk');
-
-            if(sdk)
-                data.sdk = sdk;
-            
-            $.ajax({
-                url: url+"category/api",
-                data: data,
-                type: "POST",
-                success: function(response){
-                    var table = "<tr><th><b>NAME</b></th><th><b>REQUESTS</b></th></tr>";
-                    for(var i=0;i<response.length;i++){
-                        table = table + "<tr><td>"+response[i].category.toUpperCase()+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>"+addCommas(response[i].apiCount)+"</td></tr>";
+        $.ajax({
+            url: url+"app/active",
+            data: data,
+            type: "POST",
+            success: function(response){
+               var text ="";
+               
+               response.sort(function(a,b){return b.apiCount-a.apiCount});
+                console.log(response);
+                var funData =[];
+                var funLabels = [];
+                var funOptions = [];
+                $('.cf-funnel').each(function(){
+                    for(var i=0;i<response.length;i++) {
+                        funData.push(response[i].apiCount);
+                        funLabels.push(response[i].appId);
+                        funOptions = {barOpacity: true};
                     }
-                    $("#svp-1").append(table);
-                },
-                error: function(response){
-                    console.log(response);
-                }
-            });
+
+                    cf_rFunnels[$(this).prop('id')] = new FunnelChart($(this).prop('id'), funData, funLabels, funOptions);
+                });
+               
+            },
+            error: function(response){
+                console.log(response);
+            }
+        });   
+    }
+
+    //Get top active apps with API count.
+    function getTopActiveAppsApiCount(requestedHost,requestedSdk){   
+
+        var data = {};
+        data.host = requestedHost;
+        data.sdk = requestedSdk;
+
+        $.ajax({
+            url: url+"app/active/count",
+            data: data,
+            type: "POST",
+            success: function(response){
+                var count = response.count;
+                $("#totalApps").text(addCommas(count));
+            },
+            error: function(response){
+                console.log(response);
+            }
         });
+   
+    }
 
-        //get last week API Count. 
-        $(document).ready(function(){
-            var apiCount = 0;
-            
-            var aWeekAgo = new Date();
-            var numberOfDays = 7;
-            aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
+    //Get top active apps with API count.
+    function getTopActiveAppsApiFunnelCount(requestedHost,requestedSdk){   
 
-           var data = {"fromTime":aWeekAgo.getTime(),
-                       "toTime" : new Date().getTime(),
-                        "limit" : 5};
+        var data = {};
+        data.host = requestedHost;
+        data.sdk = requestedSdk;
 
-            var sdk = getParameterByName('sdk');
-
-            if(sdk)
-                data.sdk = sdk;
-            
-            $.ajax({
-                url: url+"api/count",
-                data: data,
-                type: "POST",
-                success: function(response){
-                    var count = response.count;
-                    $("#lastWeekAPI").text(addCommas(count));
-                    
-                    //get previous week api count to calculate growth rate. 
-                    var twoWeeksAgo = new Date(aWeekAgo);
-                    var numberOfDays = 7;
-                    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - numberOfDays); 
-                    
-                    var data = {"fromTime":twoWeeksAgo.getTime(),
-                                "toTime" : aWeekAgo.getTime()};
-
-                    var sdk = getParameterByName('sdk');
-
-                    if(sdk)
-                        data.sdk = sdk;          
-
-                    $.ajax({
-                        url: url+"api/count",
-                        data: data,
-                        type: "POST",
-                        success: function(response){
-                           var lastWeek = response.count; 
-                           var thisWeek = count;
-                           
-                           //calculate growth rate. 
-                           var growth = ((thisWeek - lastWeek)/lastWeek)*100;
-                           
-                           //round to 1 decimal place. 
-                           var finalNumber = Math.round( growth * 10) / 10;
-                           
-                           $("#apiGrowthRate").text(finalNumber+"%");
-                        },
-                        error: function(response){
-                            console.log(response);
-                        }
-                    });
-                    
-                },
-                error: function(response){
-                    console.log(response);
-                }
-            });
+        $.ajax({
+            url: url+"app/funnel/count",
+            data: data,
+            type: "POST",
+            success: function(response){
+                var count = response.count;
+                $("#funnelCount").text(addCommas(count));
+            },
+            error: function(response){
+                console.log(response);
+            }
         });
+  
+    }
+    
+    
+    //Get category count.
+    function getCategoryCount(requestedHost,requestedSdk){
+    
+        var apiCount = 0;
 
-        //get last week API Count. 
-        $(document).ready(function(){
-            var apiCount = 0;
-            
-            var aWeekAgo = new Date();
-            var numberOfDays = 7;
-            aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
-            
-            var data = {"fromTime":aWeekAgo.getTime(),
-                        "toTime" : new Date().getTime()};
-
-             var sdk = getParameterByName('sdk');
-
-            if(sdk)
-                data.sdk = sdk;
-
-            $.ajax({
-                url: url+"app/funnel/count",
-                data: data,
-                type: "POST",
-                success: function(response){
-                    var count = response.count;
-                    $("#lastWeekFunnelCount").text(addCommas(count));
-                    
-                    //get previous week api count to calculate growth rate. 
-                    var twoWeeksAgo = new Date(aWeekAgo);
-                    var numberOfDays = 7;
-                    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - numberOfDays); 
-                    
-
-                    var data = {"fromTime":twoWeeksAgo.getTime(),
-                                "toTime" : aWeekAgo.getTime()};
-
-                     var sdk = getParameterByName('sdk');
-
-                    if(sdk)
-                        data.sdk = sdk;
-
-                    $.ajax({
-                        url: url+"app/funnel/count",
-                        data: data,
-                        type: "POST",
-                        success: function(response){
-                           var lastWeek = response.count; 
-                           var thisWeek = count;
-                           
-                           //calculate growth rate. 
-                           var growth = ((thisWeek - lastWeek)/lastWeek)*100;
-                           
-                           //round to 1 decimal place. 
-                           var finalNumber = Math.round( growth * 10) / 10;
-                           
-                           $("#funnelGrowthRate").text(finalNumber+"%");
-                        },
-                        error: function(response){
-                            console.log(response);
-                        }
-                    });
-                    
-                },
-                error: function(response){
-                    console.log(response);
-                }
-            });
-        });
-
-
-        //get last active apps count. 
-        $(document).ready(function(){
-            var apiCount = 0;
-            
-            var aWeekAgo = new Date();
-            var numberOfDays = 7;
-            aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
-            
-            var data = {"fromTime":aWeekAgo.getTime(),
-                        "toTime" : new Date().getTime()};
-
-             var sdk = getParameterByName('sdk');
-
-            if(sdk)
-                data.sdk = sdk;
-
-            $.ajax({
-                url: url+"app/active/count",
-                data: data,
-                type: "POST",
-                success: function(response){
-                    var count = response.count;
-                    $("#activeApps").text(addCommas(count));
-                    
-                    //get previous week api count to calculate growth rate. 
-                    var twoWeeksAgo = new Date(aWeekAgo);
-                    var numberOfDays = 7;
-                    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - numberOfDays); 
-                    
-
-                    var data = {"fromTime":twoWeeksAgo.getTime(),
-                                "toTime" : aWeekAgo.getTime()};
-
-                    if(sdk)
-                        data.sdk = sdk;
-
-                    $.ajax({
-                        url: url+"app/active/count",
-                        data: data,
-                        type: "POST",
-                        success: function(response){
-                           var lastWeek = response.count; 
-                           var thisWeek = count;
-                           
-                           //calculate growth rate. 
-                           var growth = ((thisWeek - lastWeek)/lastWeek)*100;
-                           
-                           //round to 1 decimal place. 
-                           var finalNumber = Math.round( growth * 10) / 10;
-                           
-                           $("#appGrowthRate").text(finalNumber+"%");
-                        },
-                        error: function(response){
-                            console.log(response);
-                        }
-                    });
-                    
-                },
-                error: function(response){
-                    console.log(response);
-                }
-            });
-        });
-
-
-        //Get Total number of apps which crossed 5000 calls.
-        $(document).ready(function(){
-            $.ajax({
-                url: url+"api/5000",                
-                type: "GET",
-                success: function(response){
-                    $("#app5000").text(response);
-                },
-                error: function(response){
-                    console.log(response);
-                }
-            });
-        });
+        var aWeekAgo = new Date();
+        var numberOfDays = 7;
+        aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
         
-        //Get Total number of apps which crossed 10000 calls.
-        $(document).ready(function(){
-            $.ajax({
-                url: url+"api/10000",                
-                type: "GET",
-                success: function(response){
-                    $("#app10000").text(response);
-                },
-                error: function(response){
-                    console.log(response);
-                }
-            });
-        });
+       var data = {"fromTime":aWeekAgo.getTime(),
+                   "toTime" : new Date().getTime(),
+                    "limit" : 5};
 
-        //Get Total number of apps which crossed 15000 calls.
-        $(document).ready(function(){
-            $.ajax({
-                url: url+"api/15000",                
-                type: "GET",
-                success: function(response){
-                   $("#app15000").text(response); 
-                },
-                error: function(response){
-                    console.log(response);
+        data.host = requestedHost;
+        data.sdk = requestedSdk;
+        
+        $.ajax({
+            url: url+"category/api",
+            data: data,
+            type: "POST",
+            success: function(response){
+                var table = "<tr><th><b>NAME</b></th><th><b>REQUESTS</b></th></tr>";
+                for(var i=0;i<response.length;i++){
+                    table = table + "<tr><td>"+response[i].category.toUpperCase()+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>"+addCommas(response[i].apiCount)+"</td></tr>";
                 }
-            });
+                $("#svp-1").append(table);
+            },
+            error: function(response){
+                console.log(response);
+            }
+        });    
+    }
+
+    //get last week API Count. 
+    function getLastWeekApiCount(requestedHost,requestedSdk){
+    
+        var apiCount = 0;
+        
+        var aWeekAgo = new Date();
+        var numberOfDays = 7;
+        aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
+
+        var data = {"fromTime":aWeekAgo.getTime(),
+                   "toTime" : new Date().getTime(),
+                    "limit" : 5};
+
+        data.host = requestedHost;
+        data.sdk = requestedSdk;
+        
+        $.ajax({
+            url: url+"api/count",
+            data: data,
+            type: "POST",
+            success: function(response){
+                var count = response.count;
+                $("#lastWeekAPI").text(addCommas(count));
+                
+                //get previous week api count to calculate growth rate. 
+                var twoWeeksAgo = new Date(aWeekAgo);
+                var numberOfDays = 7;
+                twoWeeksAgo.setDate(twoWeeksAgo.getDate() - numberOfDays); 
+                
+                var data = {"fromTime":twoWeeksAgo.getTime(),
+                            "toTime" : aWeekAgo.getTime()};
+
+                data.host = requestedHost;
+                data.sdk = requestedSdk;          
+
+                $.ajax({
+                    url: url+"api/count",
+                    data: data,
+                    type: "POST",
+                    success: function(response){
+                       var lastWeek = response.count; 
+                       var thisWeek = count;
+                       
+                       //calculate growth rate. 
+                       var growth = ((thisWeek - lastWeek)/lastWeek)*100;
+                       
+                       //round to 1 decimal place. 
+                       var finalNumber = Math.round( growth * 10) / 10;
+                       
+                       $("#apiGrowthRate").text(finalNumber+"%");
+                    },
+                    error: function(response){
+                        console.log(response);
+                    }
+                });
+                
+            },
+            error: function(response){
+                console.log(response);
+            }
         });
+    
+    }
+
+    //get last week API Count. 
+    function getLastWeekApiFunnelCount(requestedHost,requestedSdk){
+    
+        var apiCount = 0;
+        
+        var aWeekAgo = new Date();
+        var numberOfDays = 7;
+        aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
+        
+        var data = {"fromTime":aWeekAgo.getTime(),
+                    "toTime" : new Date().getTime()};
+
+        data.host = requestedHost;
+        data.sdk = requestedSdk;;
+
+        $.ajax({
+            url: url+"app/funnel/count",
+            data: data,
+            type: "POST",
+            success: function(response){
+                var count = response.count;
+                $("#lastWeekFunnelCount").text(addCommas(count));
+                
+                //get previous week api count to calculate growth rate. 
+                var twoWeeksAgo = new Date(aWeekAgo);
+                var numberOfDays = 7;
+                twoWeeksAgo.setDate(twoWeeksAgo.getDate() - numberOfDays); 
+                
+
+                var data = {"fromTime":twoWeeksAgo.getTime(),
+                            "toTime" : aWeekAgo.getTime()};
+
+                data.host = requestedHost;
+                data.sdk = requestedSdk;
+
+                $.ajax({
+                    url: url+"app/funnel/count",
+                    data: data,
+                    type: "POST",
+                    success: function(response){
+                       var lastWeek = response.count; 
+                       var thisWeek = count;
+                       
+                       //calculate growth rate. 
+                       var growth = ((thisWeek - lastWeek)/lastWeek)*100;
+                       
+                       //round to 1 decimal place. 
+                       var finalNumber = Math.round( growth * 10) / 10;
+                       
+                       $("#funnelGrowthRate").text(finalNumber+"%");
+                    },
+                    error: function(response){
+                        console.log(response);
+                    }
+                });
+                
+            },
+            error: function(response){
+                console.log(response);
+            }
+        });
+   
+    }
+
+    //get last active apps count. 
+    function getLastActiveAppsCount(requestedHost,requestedSdk){
+    
+        var apiCount = 0;
+        
+        var aWeekAgo = new Date();
+        var numberOfDays = 7;
+        aWeekAgo.setDate(aWeekAgo.getDate() - numberOfDays); 
+        
+        var data = {"fromTime":aWeekAgo.getTime(),
+                    "toTime" : new Date().getTime()};
+
+        data.host = requestedHost;
+        data.sdk = requestedSdk;
+
+        $.ajax({
+            url: url+"app/active/count",
+            data: data,
+            type: "POST",
+            success: function(response){
+                var count = response.count;
+                $("#activeApps").text(addCommas(count));
+                
+                //get previous week api count to calculate growth rate. 
+                var twoWeeksAgo = new Date(aWeekAgo);
+                var numberOfDays = 7;
+                twoWeeksAgo.setDate(twoWeeksAgo.getDate() - numberOfDays); 
+                
+
+                var data = {"fromTime":twoWeeksAgo.getTime(),
+                            "toTime" : aWeekAgo.getTime()};
+
+                data.host = requestedHost;
+                data.sdk = requestedSdk;
+
+                $.ajax({
+                    url: url+"app/active/count",
+                    data: data,
+                    type: "POST",
+                    success: function(response){
+                       var lastWeek = response.count; 
+                       var thisWeek = count;
+                       
+                       //calculate growth rate. 
+                       var growth = ((thisWeek - lastWeek)/lastWeek)*100;
+                       
+                       //round to 1 decimal place. 
+                       var finalNumber = Math.round( growth * 10) / 10;
+                       
+                       $("#appGrowthRate").text(finalNumber+"%");
+                    },
+                    error: function(response){
+                        console.log(response);
+                    }
+                });
+                
+            },
+            error: function(response){
+                console.log(response);
+            }
+        });
+    
+    }
+
+    //Get Total number of apps which crossed 5000 calls.
+    function apps5000(requestedHost,requestedSdk){  
+    
+        var data = {};
+        data.host = requestedHost;
+        data.sdk = requestedSdk;
+
+        $.ajax({
+            url: url+"api/5000", 
+            data: data,               
+            type: "POST",
+            success: function(response){
+                $("#app5000").text(response);
+            },
+            error: function(response){
+                console.log(response);
+            }
+        });
+    
+    }
+    
+    //Get Total number of apps which crossed 10000 calls.
+    function apps10000(requestedHost,requestedSdk){
+
+        var data = {};
+        data.host = requestedHost;
+        data.sdk = requestedSdk;
+
+        $.ajax({
+            url: url+"api/10000",
+            data: data,                
+            type: "POST",
+            success: function(response){
+                $("#app10000").text(response);
+            },
+            error: function(response){
+                console.log(response);
+            }
+        });   
+    }
+
+    //Get Total number of apps which crossed 15000 calls.
+    function apps15000(requestedHost,requestedSdk){
+
+        var data = {};
+        data.host = requestedHost;
+        data.sdk = requestedSdk;
+
+        $.ajax({
+            url: url+"api/15000", 
+            data: data,               
+            type: "POST",
+            success: function(response){
+               $("#app15000").text(response); 
+            },
+            error: function(response){
+                console.log(response);
+            }
+        });
+    }
     </script>
 
 </body>
