@@ -212,7 +212,7 @@ function _prepareResponse(dayCountList) {
     
     var totalStorage=0;
     for(var i=0;i<dayCountList.length;++i){
-        totalStorage=totalStorage+parseInt(dayCountList[i].size);
+        totalStorage=totalStorage+parseFloat(dayCountList[i].size);
         delete dayCountList[i].host;
     }  
    
