@@ -5,15 +5,21 @@ module.exports ={
         
         var deferred= q.defer();
         
-        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.salesNamespace);      
-            
-        collection.save(saleDocument,function(err,doc){
-            if(err) {               
-                deferred.reject(err);
-            }else{                             
-                deferred.resolve(doc.ops[0]);                              
-            }
-        });
+        try{
+            var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.salesNamespace);      
+                
+            collection.save(saleDocument,function(err,doc){
+                if(err) {               
+                    deferred.reject(err);
+                }else{                             
+                    deferred.resolve(doc.ops[0]);                              
+                }
+            });
+
+        } catch(err){           
+            global.winston.log('error',err);
+            deferred.reject(err);
+        }
        
         return deferred.promise; 
     },
@@ -22,15 +28,22 @@ module.exports ={
         
         var deferred= q.defer();
         
-        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.salesNamespace);         
+        try{
+            
+            var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.salesNamespace);         
 
-        collection.find({appId:appId,userId:userId}).sort({saleTimestamp:-1}).toArray(function(err,docs){
-            if(err) {                
-                deferred.reject(err);
-            }else{                
-                deferred.resolve(docs[0]);
-            }
-        });
+            collection.find({appId:appId,userId:userId}).sort({saleTimestamp:-1}).toArray(function(err,docs){
+                if(err) {                
+                    deferred.reject(err);
+                }else{                
+                    deferred.resolve(docs[0]);
+                }
+            });
+
+        } catch(err){           
+            global.winston.log('error',err);
+            deferred.reject(err);
+        }
        
         return deferred.promise; 
     },

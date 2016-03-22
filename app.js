@@ -2,6 +2,9 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoClient = require('mongodb').MongoClient;
 var CronJob = require('cron').CronJob;
+global.winston = require('winston');
+require('winston-loggly');
+var expressWinston = require('express-winston');
 
 module.exports = function(){	
 
@@ -11,80 +14,90 @@ module.exports = function(){
 	global.app.use(bodyParser.json());
 	require('./config/cors.js')(); //cors
 
-	
+	global.winston.add(global.winston.transports.Loggly, {
+	    token: global.keys.logToken,
+	    subdomain: "cloudboost",
+	    tags: ["analytics-server"],
+	    json:true
+	});	
 
 	function connectMongoDB(){
 	   //MongoDB connections. 
 
-	   if(!global.config && !process.env["ANALYTICS_MONGO_SERVICE_HOST"]){
-	      console.error("FATAL : MongoDB Cluster Not found. Use docker-compose from https://github.com/cloudboost/docker or Kubernetes from https://github.com/cloudboost/kubernetes");
-	   }
+	   try{
+		   if(!global.config && !process.env["ANALYTICS_MONGO_SERVICE_HOST"]){
+		      console.error("FATAL : MongoDB Cluster Not found. Use docker-compose from https://github.com/cloudboost/docker or Kubernetes from https://github.com/cloudboost/kubernetes");
+		   }
 
-	   var mongoConnectionString = "mongodb://";
-	   
-	   var isReplicaSet = false;
-	   
-	   if(global.config && global.config.mongo && global.config.mongo.length>0){
-	       //take from config file
-	       
-	       if(global.config.mongo.length>1){
-	           isReplicaSet = true;
-	       }
-	       
-	       for(var i=0;i<global.config.mongo.length;i++){
-	            mongoConnectionString+=global.config.mongo[i].host +":"+global.config.mongo[i].port;
-	            mongoConnectionString+=",";
-	       }
+		   var mongoConnectionString = "mongodb://";
+		   
+		   var isReplicaSet = false;
+		   
+		   if(global.config && global.config.mongo && global.config.mongo.length>0){
+		       //take from config file
+		       
+		       if(global.config.mongo.length>1){
+		           isReplicaSet = true;
+		       }
+		       
+		       for(var i=0;i<global.config.mongo.length;i++){
+		            mongoConnectionString+=global.config.mongo[i].host +":"+global.config.mongo[i].port;
+		            mongoConnectionString+=",";
+		       }
 
-	   }else{
-	        
-	        if(!global.config){
-	            global.config = {};
-	        }
+		   }else{
+		        
+		        if(!global.config){
+		            global.config = {};
+		        }
 
-	        global.config.mongo = []; 
-	        
-	       if(process.env["ANALYTICS_MONGO_SERVICE_HOST"]){
-	            console.log("MongoDB is running on Kubernetes");
-	           
-	            global.config.mongo.push({
-	                host :  process.env["ANALYTICS_MONGO_SERVICE_HOST"],
-	                port : process.env["ANALYTICS_MONGO_SERVICE_PORT"]
-	            });
+		        global.config.mongo = []; 
+		        
+		       if(process.env["ANALYTICS_MONGO_SERVICE_HOST"]){
+		            console.log("MongoDB is running on Kubernetes");
+		           
+		            global.config.mongo.push({
+		                host :  process.env["ANALYTICS_MONGO_SERVICE_HOST"],
+		                port : process.env["ANALYTICS_MONGO_SERVICE_PORT"]
+		            });
 
-	            mongoConnectionString+=process.env["ANALYTICS_MONGO_SERVICE_HOST"]+":"+process.env["ANALYTICS_MONGO_SERVICE_PORT"]; 
-	            mongoConnectionString+=",";
-	            
-	            isReplicaSet = true;    
-	       }
-	   }
-	  
-	   mongoConnectionString = mongoConnectionString.substring(0, mongoConnectionString.length - 1);
-	   mongoConnectionString += "/"; //de limitter. 
-	   global.keys.mongoConnectionString = mongoConnectionString;
+		            mongoConnectionString+=process.env["ANALYTICS_MONGO_SERVICE_HOST"]+":"+process.env["ANALYTICS_MONGO_SERVICE_PORT"]; 
+		            mongoConnectionString+=",";
+		            
+		            isReplicaSet = true;    
+		       }
+		   }
+		  
+		   mongoConnectionString = mongoConnectionString.substring(0, mongoConnectionString.length - 1);
+		   mongoConnectionString += "/"; //de limitter. 
+		   global.keys.mongoConnectionString = mongoConnectionString;
 
-	   if(isReplicaSet){
-	       console.log("MongoDB is in ReplicaSet");
-	       var str = "?replicaSet=cloudboostanalytics&slaveOk=true";
-	       global.keys.mongoConnectionString+=str;
-	   }
+		   if(isReplicaSet){
+		       console.log("MongoDB is in ReplicaSet");
+		       var str = "?replicaSet=cloudboostanalytics&slaveOk=true";
+		       global.keys.mongoConnectionString+=str;
+		   }
 
-	   console.log("MongoDB connection string : ");
-	   console.log(global.keys.mongoConnectionString);
-	   
-	   mongoClient.connect(global.keys.mongoConnectionString,function (err, db) {
-	        if (err) {
-	            console.log("Error connecting to MongoDB");
-	            console.log(err);
-	        } else {            
-	            console.log("Database connected successfully");
-	            global.mongoClient = db;
+		   console.log("MongoDB connection string : ");
+		   console.log(global.keys.mongoConnectionString);
+		   
+		   mongoClient.connect(global.keys.mongoConnectionString,function (err, db) {
+		        if (err) {
+		            console.log("Error connecting to MongoDB");
+		            console.log(err);
+		        } else {            
+		            console.log("Database connected successfully");
+		            global.mongoClient = db;
 
-	            //allowing services to run after connecting to mongoDB
-	            attachServices();
-   				attachAPI();   				   				   			
-	        }
-	    });
+		            //allowing services to run after connecting to mongoDB
+		            attachServices();
+	   				attachAPI();   				   				   			
+		        }
+		    });
+
+		}catch(e){
+			global.winston.log('error',e);
+		}
 
 	}
 
@@ -98,6 +111,7 @@ module.exports = function(){
 	       require('./api/appPlans')();	              
 	    }catch(e){
 	       console.log(e);
+	       global.winston.log('error',e);
 	    }
 	}
 
@@ -117,6 +131,7 @@ module.exports = function(){
 	       global.notificationService = require('./service/notificationService.js');
 	    }catch(e){
 	       console.log(e);
+	       global.winston.log('error',e);
 	    }	    
 	}
 

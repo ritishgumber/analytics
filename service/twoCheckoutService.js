@@ -16,42 +16,48 @@ module.exports = {
         
         var deferred= q.defer();        
        
-        var merchantOrderId=uuid.v1();
+        try{
+          var merchantOrderId=uuid.v1();
 
-		    var params = {
-            "merchantOrderId": merchantOrderId,
-            "token": data.token.toString(),
-            "currency": "USD",                                 
-            "billingAddr": {
-                "name": data.billingAddr.name,
-                "addrLine1": data.billingAddr.addrLine1,
-                "addrLine2": data.billingAddr.addrLine2,
-                "city":  data.billingAddr.city,
-                "state": data.billingAddr.state,
-                "zipCode": data.billingAddr.zipCode,
-                "country": data.billingAddr.country,
-                "email":data.userEmail               
-            },
-            "lineItems":[{
-              "type":"product",
-              "name":selectedPlan.planName,
-              "quantity":"1",
-              "price":selectedPlan.price,                          
-              "tangible":"N",
-              "recurrence":"1 Month",
-              "duration":"Forever",
-              "startupFee":null              
-            }]
-        };     
+  		    var params = {
+              "merchantOrderId": merchantOrderId,
+              "token": data.token.toString(),
+              "currency": "USD",                                 
+              "billingAddr": {
+                  "name": data.billingAddr.name,
+                  "addrLine1": data.billingAddr.addrLine1,
+                  "addrLine2": data.billingAddr.addrLine2,
+                  "city":  data.billingAddr.city,
+                  "state": data.billingAddr.state,
+                  "zipCode": data.billingAddr.zipCode,
+                  "country": data.billingAddr.country,
+                  "email":data.userEmail               
+              },
+              "lineItems":[{
+                "type":"product",
+                "name":selectedPlan.planName,
+                "quantity":"1",
+                "price":selectedPlan.price,                          
+                "tangible":"N",
+                "recurrence":"1 Month",
+                "duration":"Forever",
+                "startupFee":null              
+              }]
+          };     
 
-        //Make the call using the authorization object and your callback function
-    		tco.checkout.authorize(params, function (error, data) {
-    		    if (error) {    		    			       
-    		      deferred.reject(error);
-    		    } else {                	
-    		    	deferred.resolve(data);		        
-    		    }
-  		  });
+          //Make the call using the authorization object and your callback function
+      		tco.checkout.authorize(params, function (error, data) {
+      		    if (error) {    		    			       
+      		      deferred.reject(error);
+      		    } else {                	
+      		    	deferred.resolve(data);		        
+      		    }
+    		  });
+
+        } catch(err){           
+            global.winston.log('error',err);
+            deferred.reject(err);
+        }
         
         return deferred.promise;
     },
@@ -60,17 +66,23 @@ module.exports = {
         
       var deferred= q.defer(); 
 
-      args = {
-        invoice_id: invoiceId
-      };
+      try{
+        args = {
+          invoice_id: invoiceId
+        };
 
-      tco.sales.retrieve(args, function (error, data) {
-          if (error) {
-            deferred.reject(error);  
-          } else {
-            deferred.resolve(data);  
-          }
-      });
+        tco.sales.retrieve(args, function (error, data) {
+            if (error) {
+              deferred.reject(error);  
+            } else {
+              deferred.resolve(data);  
+            }
+        });
+
+      } catch(err){           
+          global.winston.log('error',err);
+          deferred.reject(err);
+      }
         
       return deferred.promise;
     },
@@ -79,17 +91,23 @@ module.exports = {
         
       var deferred= q.defer(); 
 
-      args = {
-        lineitem_id: lineItemId
-      };
+      try{
+        args = {
+          lineitem_id: lineItemId
+        };
 
-      tco.sales.stop(args, function (error, data) {
-          if (error) {
-            deferred.reject(error);
-          } else {
-            deferred.resolve(data);
-          }
-      });
+        tco.sales.stop(args, function (error, data) {
+            if (error) {
+              deferred.reject(error);
+            } else {
+              deferred.resolve(data);
+            }
+        });
+
+      } catch(err){           
+          global.winston.log('error',err);
+          deferred.reject(err);
+      }
         
       return deferred.promise;
     },

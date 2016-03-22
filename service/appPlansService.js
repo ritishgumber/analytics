@@ -3,36 +3,41 @@ module.exports ={
    
     upsertAppPlan : function(host,appId,planId){
         
-        _self=this;
+        var _self=this;
 
         var deferred= q.defer();
         
-        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace);      
-            
-        _self.findAppPlan(host,appId).then(function(doc){         
-            if(!doc){
+        try{
+            var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace);      
+                
+            _self.findAppPlan(host,appId).then(function(doc){         
+                if(!doc){
 
-                if(!planId){
-                    planId=1;
-                }
-                var newDoc={
-                    host:host,
-                    appId:appId,
-                    planId:planId
-                };
-                _self.insertAppPlan(newDoc).then(function(savedDoc){
-                    deferred.resolve(savedDoc.ops[0]);
-                },function(error){
-                    deferred.reject(error);
-                });
+                    if(!planId){
+                        planId=1;
+                    }
+                    var newDoc={
+                        host:host,
+                        appId:appId,
+                        planId:planId
+                    };
+                    _self.insertAppPlan(newDoc).then(function(savedDoc){
+                        deferred.resolve(savedDoc.ops[0]);
+                    },function(error){
+                        deferred.reject(error);
+                    });
 
-            }else{
-                deferred.resolve(doc);
-            }                 
+                }else{
+                    deferred.resolve(doc);
+                }                 
 
-        },function(error){
-            deferred.reject(error);
-        });
+            },function(error){
+                deferred.reject(error);
+            });
+        } catch(err){           
+            global.winston.log('error',err);
+            deferred.reject(err);
+        }
        
         return deferred.promise; 
     },  
@@ -40,15 +45,20 @@ module.exports ={
         
         var deferred= q.defer();
         
-        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace);      
-            
-        collection.insertOne(newDoc,function(err,doc){
-            if(err) {               
-                deferred.reject(err);
-            }else{                    
-                deferred.resolve(doc);                              
-            }
-        });
+        try{
+            var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace);      
+                
+            collection.insertOne(newDoc,function(err,doc){
+                if(err) {               
+                    deferred.reject(err);
+                }else{                    
+                    deferred.resolve(doc);                              
+                }
+            });
+        } catch(err){           
+            global.winston.log('error',err);
+            deferred.reject(err);
+        }
        
         return deferred.promise;
     },
@@ -56,15 +66,20 @@ module.exports ={
         
         var deferred= q.defer();
         
-        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace); 
+        try{
+            var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace); 
 
-        collection.findOne({host:host,appId:appId},function(err,doc){
-            if(err) {                
-                deferred.reject(err);
-            }else{                
-                deferred.resolve(doc);
-            }
-        });
+            collection.findOne({host:host,appId:appId},function(err,doc){
+                if(err) {                
+                    deferred.reject(err);
+                }else{                
+                    deferred.resolve(doc);
+                }
+            });
+        } catch(err){           
+            global.winston.log('error',err);
+            deferred.reject(err);
+        }
         
         return deferred.promise;
     },
@@ -72,15 +87,20 @@ module.exports ={
         
         var deferred= q.defer();
         
-        var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace);
+        try{
+            var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace);
 
-        collection.findOneAndUpdate({host:host,appId:appId}, {$set: {planId:newPlanId}}, {returnOriginal: false, upsert: true}, function(err, doc) {
-            if(err) {                
-                deferred.reject(err);
-            }else{                
-                deferred.resolve(doc);
-            } 
-        });
+            collection.findOneAndUpdate({host:host,appId:appId}, {$set: {planId:newPlanId}}, {returnOriginal: false, upsert: true}, function(err, doc) {
+                if(err) {                
+                    deferred.reject(err);
+                }else{                
+                    deferred.resolve(doc);
+                } 
+            });
+        } catch(err){           
+            global.winston.log('error',err);
+            deferred.reject(err);
+        }
 
         return deferred.promise;
     }
