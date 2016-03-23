@@ -55,7 +55,7 @@ module.exports = {
             });                      
 
         } catch(err){           
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             deferred.reject(err);
         }
         
@@ -107,7 +107,7 @@ module.exports = {
                 }
             });
         }catch(err){           
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             deferred.reject(err);
         }
         
@@ -188,7 +188,7 @@ module.exports = {
             });
 
         } catch(err){           
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             deferred.reject(err);
         }
         
@@ -235,7 +235,7 @@ module.exports = {
             });
 
         } catch(err){           
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             deferred.reject(err);
         }
         
@@ -302,7 +302,7 @@ module.exports = {
             });
 
         } catch(err){           
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             deferred.reject(err);
         }
         
@@ -367,7 +367,7 @@ module.exports = {
                 }
             });
         } catch(err){           
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             deferred.reject(err);
         }
         
@@ -392,7 +392,7 @@ module.exports = {
             });
 
         } catch(err){           
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             deferred.reject(err);
         }
         
@@ -443,7 +443,7 @@ module.exports = {
             });
 
         } catch(err){           
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             deferred.reject(err);
         }
 
@@ -502,7 +502,7 @@ function _checkAppLimit(host,appId){
         });
 
     } catch(err){           
-        global.winston.log('error',err);
+        global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
         deferred.reject(err);
     }
 
@@ -532,7 +532,7 @@ function _check100Percentage(appId,planId,apiCalls,storage){
 
     } catch(err){ 
 
-        global.winston.log('error',err);
+        global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
         return {appId:appId,limitExceeded:false,message:"Error"};
     }     
 }
@@ -592,7 +592,7 @@ function _check80Percentage(host,appId,planId,apiCalls,storage){
         }
 
     } catch(err){           
-        global.winston.log('error',err);        
+        global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;        
     }
    
 }
@@ -620,7 +620,7 @@ function _processNotifyFrontendOver100(host,appId,planId,details){
             });
         }
     } catch(err){           
-        global.winston.log('error',err);
+        global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
         console.log(err);
     }
 }
@@ -655,7 +655,7 @@ function _notifyFrontendOver80(host,appId,exceeded80){
       });
 
     } catch(err){           
-        global.winston.log('error',err);
+        global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
         deferred.reject(err);
     }
 
@@ -691,7 +691,7 @@ function _notifyFrontendOver100(host,appId,details){
       });
 
     } catch(err){           
-        global.winston.log('error',err);
+        global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
         deferred.reject(err);
     }
 

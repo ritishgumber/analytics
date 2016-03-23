@@ -96,7 +96,7 @@ module.exports = function(){
 		    });
 
 		}catch(e){
-			global.winston.log('error',e);
+			global.winston.log('error',{"error":String(e),"stack": new Error().stack}) ;
 		}
 
 	}
@@ -111,7 +111,7 @@ module.exports = function(){
 	       require('./api/appPlans')();	              
 	    }catch(e){
 	       console.log(e);
-	       global.winston.log('error',e);
+	       global.winston.log('error',{"error":String(e),"stack": new Error().stack}) ;
 	    }
 	}
 
@@ -131,7 +131,7 @@ module.exports = function(){
 	       global.notificationService = require('./service/notificationService.js');
 	    }catch(e){
 	       console.log(e);
-	       global.winston.log('error',e);
+	       global.winston.log('error',{"error":String(e),"stack": new Error().stack}) ;
 	    }	    
 	}
 

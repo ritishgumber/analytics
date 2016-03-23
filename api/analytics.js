@@ -30,7 +30,7 @@ module.exports = function() {
                 });                        
             }
         } catch(err){
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             res.status(500).send("Error");
         }
     });
@@ -53,7 +53,7 @@ module.exports = function() {
                 res.status(500).send(error);
             });
         } catch(err){
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             res.status(500).send("Error");
         }
     });
@@ -74,7 +74,7 @@ module.exports = function() {
                 res.status(500).send(error);
             });
         }catch(err){
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             res.status(500).send("Error");
         }    
     });
@@ -94,7 +94,7 @@ module.exports = function() {
                 res.status(500).send(error);
             });
         }catch(err){
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             res.status(500).send("Error");
         }     
     });
@@ -117,7 +117,7 @@ module.exports = function() {
                 res.status(500).send(error);
             });
         }catch(err){
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             res.status(500).send("Error");
         }     
         
@@ -139,7 +139,7 @@ module.exports = function() {
                 res.status(500).send(error);
             });
         }catch(err){
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             res.status(500).send("Error");
         }
         
@@ -173,7 +173,7 @@ module.exports = function() {
                 res.status(400).send("AppId and Host is required");
             }
         }catch(err){
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             res.status(500).send("Error");
         }                                
         

@@ -26,7 +26,7 @@ module.exports = function() {
         }
 
       }catch(err){
-        global.winston.log('error',err);
+        global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
         res.status(500).send("Error");
       } 
 
@@ -55,7 +55,7 @@ module.exports = function() {
           return res.status(400).send("Unauthorized. Server is not recognized.");
         }
       }catch(err){
-        global.winston.log('error',err);
+        global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
         res.status(500).send("Error");
       }
         

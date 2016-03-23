@@ -26,7 +26,7 @@ module.exports = function() {
                 return res.send(400, "Unauthorized");
             }  
         }catch(err){
-            global.winston.log('error',err);
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack});
             res.status(500).send("Error");
         }       
 
