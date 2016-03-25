@@ -99,7 +99,7 @@ module.exports = {
         
         return deferred.promise;
     },
-    countAppsByCallByMonth : function(dateObj,noCalls){
+    countAppsByCallByMonth : function(host,sdk,dateObj,noCalls){
         
         
         var deferred= q.defer();
@@ -123,7 +123,7 @@ module.exports = {
 
             noCalls=parseInt(noCalls);
 
-            collection.count({monthlyApiCount:{$gte:noCalls}, timeStamp: {$gte: startDay, $lt: endDay}      
+            collection.count({host:host,monthlyApiCount:{$gte:noCalls}, timeStamp: {$gte: startDay, $lt: endDay}      
             },function(err,count){
                 if(err) {                
                     deferred.reject(err);

@@ -123,9 +123,11 @@ module.exports = {
             
             var pipeline = [];
             
+            var query = {};
+
             //add filters. 
-            if(fromTime || toTime || sdk){
-                var query = {};
+            if(fromTime || toTime){
+                
                 query.timestamp = {};
                 if(fromTime){
                     query.timestamp.$gt = Number(fromTime);
@@ -133,15 +135,16 @@ module.exports = {
                 
                 if(toTime){
                     query.timestamp.$lt = Number(toTime);
-                }
-                
-                if(sdk)
-                    query.sdk = sdk;
-
-                if(host)
-                    query.host = host;
-                pipeline.push({$match:query});
+                }            
+               
             }
+
+            if(sdk)
+                query.sdk = sdk;
+
+            if(host)
+                query.host = host;
+            pipeline.push({$match:query});
             
             //group.
             var group = {
@@ -204,7 +207,7 @@ module.exports = {
             
             //add filters. 
             var query = {};
-            if(fromTime || toTime || sdk){
+            if(fromTime || toTime){
                 
                 query.timestamp = {};
                 
@@ -215,20 +218,23 @@ module.exports = {
                 if(toTime){
                     query.timestamp.$lt = Number(toTime);
                 }
-
-                if(sdk)
-                    query.sdk = sdk;
-
-                if(host)
-                    query.host = host;
+                
             }
+
+            if(sdk)
+                query.sdk = sdk;
+
+            if(host)
+                query.host = host;
+
+            console.log(query);
             
             collection.distinct("appId", query, function(err,docs){
                 if(err) {
                     console.log("Error in counting API");
                     console.log(err);
                     deferred.reject(err);
-                }else{
+                }else{                  
                     console.log("Count : "+docs.length);
                     deferred.resolve(docs.length);
                 }
@@ -253,7 +259,7 @@ module.exports = {
 
             //add filters. 
             var query = {};
-            if(fromTime || toTime || sdk){
+            if(fromTime || toTime){
                 
                 query.timestamp = {};
                 
@@ -263,16 +269,16 @@ module.exports = {
                 
                 if(toTime){
                     query.timestamp.$lt = Number(toTime);
-                }
-
-                if(sdk)
-                   query.sdk = sdk;
-
-                if(host)
-                   query.host = host;
-
-                pipeline.push({$match : query});
+                }                
             }
+
+            if(sdk)
+                query.sdk = sdk;
+
+            if(host)
+                query.host = host;
+
+            pipeline.push({$match : query});
             
            //group.
             var group = {
@@ -318,9 +324,11 @@ module.exports = {
             
             var pipeline = [];
             
+            var query = {};
+
             //add filters
-            if(fromTime || toTime || sdk){
-                var query = {};
+            if(fromTime || toTime){
+                
                 query.timestamp = {};
                 if(fromTime){
                     query.timestamp.$gt = Number(fromTime);
@@ -328,16 +336,16 @@ module.exports = {
                 
                 if(toTime){
                     query.timestamp.$lt = Number(toTime);
-                }
-
-                if(sdk)
-                  query.sdk = sdk;
-
-                if(host)
-                  query.host = host;
-                
-                pipeline.push({$match:query});
+                }                
             }
+
+            if(sdk)
+                query.sdk = sdk;
+
+            if(host)
+                query.host = host;
+                
+            pipeline.push({$match:query});
             
             //group.
             var group = {
