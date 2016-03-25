@@ -105,5 +105,65 @@ module.exports ={
         return deferred.promise;
     },
 
+    getDBStatuses : function(){        
+        
+        var deferred= q.defer();
+        
+        try{
+
+            var promises=[];      
+
+            promises.push(_mongoDbStatus());           
+
+            q.all(promises).then(function(resultList){
+                if(resultList && resultList[0]){
+                  deferred.resolve("All are running..");                
+                }else{
+                  deferred.reject("Something went wrong..");
+                }
+            },function(error){  
+                deferred.reject(error);          
+            });
+
+        } catch(err){           
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
+            deferred.reject(err);
+        }
+        
+        return deferred.promise;
+    },
+
 };
+
+
+function _mongoDbStatus(){
+
+    console.log("MongoDB Status Function...");
+
+    var deferred = q.defer();
+
+    try{
+
+        global.mongoClient.command({ serverStatus: 1},function(err, status){
+          if(err) { 
+            console.log(err);
+            deferred.reject(err);                                    
+          }
+
+          console.log("MongoDB Status:"+status.ok);
+          if(status && status.ok===1){         
+            deferred.resolve("Ok");                                              
+          }else{        
+            deferred.reject("Failed");
+          }
+        });
+
+    }catch(err){
+      global.winston.log('error',{"error":String(err),"stack": new Error().stack});
+      deferred.reject(err);
+    }
+
+    return deferred.promise;
+}
+
 
