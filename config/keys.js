@@ -10,7 +10,7 @@ module.exports = function(){
         privateKey:"F4A419F9-32AD-4BD9-B045-022309D78DB4",
         sandbox:false
        },
-       frontendServiceUrl:"https://service.cloudboost.io",
+       frontendServiceUrl:"http://localhost:3000",
        apiNamespace : "API",
        userApiAnalyticsNamespace : "userApiAnalytics",
        userMonthlyApiNamespace : "userMonthlyApi",

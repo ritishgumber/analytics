@@ -16,7 +16,7 @@ global.keys = require('./config/keys.js')();
 
 if(global.isDevelopment){	
        
-    global.keys.hostedSecureKey="0824ff47-252e-4828-8bfd-1feddb659b24";  
+    global.keys.hostedSecureKey="b8e40eda-3ec2-4e9e-b30c-8195be38fbae";  
 
     global.keys.twoCheckout.apiUser="rtbathulasuper";
     global.keys.twoCheckout.apiPass="Harinathsir9#";

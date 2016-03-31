@@ -212,9 +212,8 @@ module.exports = function() {
 
             var noCalls=req.params.calls; 
             var host=data.host;
-            var sdk=data.sdk;         
-
-
+            var sdk=data.sdk;
+            
             global.userMonthlyApiService.countAppsByCallByMonth(host,sdk,null,noCalls).then(function(result){                
                return res.status(200).json(result);
             }, function(error){  

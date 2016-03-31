@@ -118,16 +118,21 @@ module.exports = {
             
             var endDay=dateObj;
             endDay=new Date(endDay.getFullYear(), endDay.getMonth() + 1, 0, 23, 59, 59); 
-            endDay=endDay.getTime(); 
-
+            endDay=endDay.getTime();
 
             noCalls=parseInt(noCalls);
 
-            collection.count({host:host,monthlyApiCount:{$gte:noCalls}, timeStamp: {$gte: startDay, $lt: endDay}      
-            },function(err,count){
+            var mongoQuery={};
+            if(host){
+                mongoQuery.host=host;
+            }
+            mongoQuery.monthlyApiCount={$gte:noCalls};
+            mongoQuery.timeStamp={$gte: startDay, $lt: endDay};
+            
+            collection.count(mongoQuery,function(err,count){
                 if(err) {                
                     deferred.reject(err);
-                }else{                
+                }else{
                     deferred.resolve(count);
                 }
             });
