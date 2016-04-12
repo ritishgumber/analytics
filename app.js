@@ -63,6 +63,17 @@ module.exports = function(){
 
 		            mongoConnectionString+=process.env["ANALYTICS_MONGO_SERVICE_HOST"]+":"+process.env["ANALYTICS_MONGO_SERVICE_PORT"]; 
 		            mongoConnectionString+=",";
+
+		            var i=2;
+	              	while(process.env["ANALYTICS_MONGO"+i+"_SERVICE_HOST"]){
+		                global.config.mongo.push({
+		                    host :  process.env["ANALYTICS_MONGO"+i+"_SERVICE_HOST"],
+		                    port : process.env["ANALYTICS_MONGO"+i+"_SERVICE_PORT"]
+		                });
+		                mongoConnectionString+=process.env["ANALYTICS_MONGO"+i+"_SERVICE_HOST"]+":"+process.env["ANALYTICS_MONGO"+i+"_SERVICE_PORT"]; 
+		                mongoConnectionString+=",";
+		                ++i;
+	              	}
 		            
 		            isReplicaSet = true;    
 		       }
@@ -74,7 +85,7 @@ module.exports = function(){
 
 		   if(isReplicaSet){
 		       console.log("MongoDB is in ReplicaSet");
-		       var str = "?replicaSet=cloudboostanalytics&slaveOk=true";
+		       var str = "?replicaSet=cloudboostanalytics&slaveOk=true&maxPoolSize=200&ssl=false&connectTimeoutMS=30000&socketTimeoutMS=30000&w=1&wtimeoutMS=30000";
 		       global.keys.mongoConnectionString+=str;
 		   }
 
