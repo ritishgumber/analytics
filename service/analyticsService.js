@@ -656,9 +656,15 @@ function _notifyFrontendOver80(host,appId,exceeded80){
         
           if(err || response.statusCode === 500 || response.statusCode === 400 || body === 'Error'){       
             deferred.reject(err);
-          }else {    
-            var respBody=JSON.parse(body);                           
-            deferred.resolve(respBody);
+          }else {  
+            console.log("Response from frontend over 80 usage");
+            console.log(body);
+            try{
+                var respBody=JSON.parse(body);
+                deferred.resolve(respBody);
+            }catch(e){
+                deferred.reject(e);
+            }             
           }
       });
 
@@ -693,8 +699,14 @@ function _notifyFrontendOver100(host,appId,details){
           if(err || response.statusCode === 500 || response.statusCode === 400 || body === 'Error'){       
             deferred.reject(err);
           }else {    
-            var respBody=JSON.parse(body);                           
-            deferred.resolve(respBody);
+            console.log("Response from frontend over 100 usage");
+            console.log(body);
+            try{
+                var respBody=JSON.parse(body);
+                deferred.resolve(respBody);
+            }catch(e){
+                deferred.reject(e);
+            }
           }
       });
 
