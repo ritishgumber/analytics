@@ -85,7 +85,7 @@ module.exports ={
                 fromTime=fromTime.getTime();
             }             
           
-            collection.find({host:host,appId:appId,timeStamp: {$gte: fromTime}}).toArray(function(err,docs){
+            collection.find({host:host,appId:appId,timeStamp: {"$gte": fromTime}}).toArray(function(err,docs){
                 if(err) {                               
                     deferred.reject(err);
                 }else if(docs && docs.length>0){

@@ -48,7 +48,7 @@ module.exports = {
             endDay=endDay.getTime();     
 
 
-            collection.findOne({host:host,appId:appId,notifyType:notifyType,timeStamp: {$gte: startDay, $lt: endDay}      
+            collection.findOne({host:host,appId:appId,notifyType:notifyType,timeStamp: {"$gte": startDay, "$lt": endDay}      
             },function(err,doc){
                 if(err) {                
                     deferred.reject(err);

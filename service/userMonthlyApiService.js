@@ -83,7 +83,7 @@ module.exports = {
             endDay=new Date(endDay.getFullYear(), endDay.getMonth() + 1, 0, 23, 59, 59); 
             endDay=endDay.getTime(); 
 
-            collection.findOne({host:host,appId:appId, timeStamp: {$gte: startDay, $lt: endDay}      
+            collection.findOne({host:host,appId:appId, timeStamp: {"$gte": startDay, "$lt": endDay}      
             },function(err,doc){
                 if(err) {                
                     deferred.reject(err);
@@ -126,8 +126,8 @@ module.exports = {
             if(host){
                 mongoQuery.host=host;
             }
-            mongoQuery.monthlyApiCount={$gte:noCalls};
-            mongoQuery.timeStamp={$gte: startDay, $lt: endDay};
+            mongoQuery.monthlyApiCount={"$gte":noCalls};
+            mongoQuery.timeStamp={"$gte": startDay, "$lt": endDay};
             
             collection.count(mongoQuery,function(err,count){
                 if(err) {                
@@ -160,7 +160,7 @@ module.exports = {
             endDay=new Date(endDay.getFullYear(), endDay.getMonth() + 1, 0, 23, 59, 59); 
             endDay=endDay.getTime();  
                 
-            collection.findOneAndUpdate({host:host,appId:appId,timeStamp: {$gte: startDay, $lt: endDay}
+            collection.findOneAndUpdate({host:host,appId:appId,timeStamp: {"$gte": startDay, "$lt": endDay}
             },{$set:newJson},{upsert: true,returnOriginal:false},function(err,doc){
                 if(err) {               
                     deferred.reject(err);
@@ -191,7 +191,7 @@ module.exports = {
                 fromTime=fromTime.getTime();
             }             
           
-            collection.findOne({host:host,appId:appId,timeStamp: {$gte: fromTime}},function(err,doc){
+            collection.findOne({host:host,appId:appId,timeStamp: {"$gte": fromTime}},function(err,doc){
                 if(err) {                               
                     deferred.reject(err);
                 }else if(doc){
@@ -230,7 +230,7 @@ module.exports = {
                 fromTime=fromTime.getTime();
             }             
           
-            collection.find({host:host,appId:{ $in: appIdArray },timeStamp: {$gte: fromTime}}).toArray(function(err,docs){
+            collection.find({host:host,appId:{ $in: appIdArray },timeStamp: {"$gte": fromTime}}).toArray(function(err,docs){
                 if(err) { 
 
                     var response=[];

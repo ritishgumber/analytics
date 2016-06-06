@@ -82,7 +82,7 @@ module.exports = {
             endDay=endDay.getTime();     
 
 
-            collection.findOne({host:host,appId:appId, timeStamp: {$gte: startDay, $lt: endDay}      
+            collection.findOne({host:host,appId:appId, timeStamp: {"$gte": startDay, "$lt": endDay}      
             },function(err,doc){
                 if(err) {                
                     deferred.reject(err);
@@ -113,7 +113,7 @@ module.exports = {
             endDay.setHours(23,59,59,0);
             endDay=endDay.getTime(); 
                 
-            collection.findOneAndUpdate({host:host,appId:appId,timeStamp: {$gte: startDay, $lt: endDay}
+            collection.findOneAndUpdate({host:host,appId:appId,timeStamp: {"$gte": startDay, "$lt": endDay}
             },{$set:newJson},{upsert: true,returnOriginal:false},function(err,docList){
                 if(err) {               
                     deferred.reject(err);
@@ -145,7 +145,7 @@ module.exports = {
                 fromTime=fromTime.getTime();
             }             
           
-            collection.find({host:host,appId:appId,timeStamp: {$gte: fromTime}}).toArray(function(err,docs){
+            collection.find({host:host,appId:appId,timeStamp: {"$gte": fromTime}}).toArray(function(err,docs){
                 if(err) {                               
                     deferred.reject(err);
                 }else if(docs && docs.length>0){
