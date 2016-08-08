@@ -25,7 +25,6 @@
     "test": "echo \"Info: no test specified\" && exit 0",
     "start": "node server.js"
   },
-
   "author": "CloudBoost <http://www.cloudboost.io>",
   "license": "ISC"
 }

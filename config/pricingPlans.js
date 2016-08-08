@@ -7,47 +7,39 @@ module.exports = function(){
             apiCalls:10000,
             storage:0.2,
             connections:100,
-            boost:false
+            mongoDbAccess:false
        },{
        	id:2,
-       	price:"10.00",
-       	planName:"Prototype Plan",
-            apiCalls:50000,
-            storage:1,
-            connections:100,
-            boost:false
-       },{
-       	id:3,
        	price:"49.00",
        	planName:"Launch Plan",
-            apiCalls:150000,
+            apiCalls:250000,
             storage:5,
             connections:500,
-            boost:true
+            mongoDbAccess:true
        },{
-       	id:4,
+       	id:3,
        	price:"149.00",
        	planName:"Bootstrap Plan",
-            apiCalls:500000,
+            apiCalls:1000000,
             storage:10,
             connections:10000,
-            boost:true
+            mongoDbAccess:true
        },{
-       	id:5,
+       	id:4,
        	price:"449.00",
        	planName:"Scale Plan",
-            apiCalls:2000000,
+            apiCalls:5000000,
             storage:30,
             connections:10000,
-            boost:true
+            mongoDbAccess:true
        },{
-       	id:6,
+       	id:5,
        	price:"1449.00",
        	planName:"Unicorn",
-            apiCalls:5000000,
+            apiCalls:10000000,
             storage:100,
             connections:10000,
-            boost:true
+            mongoDbAccess:true
        }]
     };
 };
