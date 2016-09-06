@@ -32,6 +32,32 @@ module.exports = function() {
 
     });
 
+     //Create Sale
+    global.app.post('/:appId/thirdPartySale',function(req,res){
+
+      try{ 
+
+        var data = req.body || {};
+        var appId=req.params.appId;  
+
+        if(data.secureKey && global.keys.hostedSecureKey===data.secureKey){
+            
+          global.paymentsService.createThirdPartySale(appId,data).then(function() {        
+            return res.status(200).json();
+          },function(error){              
+            return res.status(400).send(error);
+          });
+
+        }else{         
+          return res.status(400).send("Unauthorized. Server is not recognized.");
+        }
+
+      }catch(err){
+        global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
+        res.status(500).send("Error");
+      } 
+    });
+
 
     //Cancel(stop recurring)
     global.app.post('/:appId/cancel',function(req,res){

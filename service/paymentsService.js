@@ -3,7 +3,32 @@ var pricingPlans = require('../config/pricingPlans.js')();
 
 module.exports ={
 
-   
+    createThirdPartySale : function(appId,data){
+        
+        var _self = this;
+
+        var deferred= q.defer();   
+        
+        try{
+            var selectedPlan=_.first(_.where(pricingPlans.plans, {id: data.planId}));
+
+            //update appPlan
+            global.appPlansService.updatePlanId(data.secureKey,appId,data.planId).then(function(){
+                console.log("Create third party sale resolved.");
+                deferred.resolve();
+            }, function(error){
+                deferrd.reject(error);
+            });
+            
+        } catch(err){           
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
+            deferred.reject(err);
+        }
+
+        return deferred.promise; 
+    },
+
+
     createSale : function(appId,data){
         
         var _self = this;

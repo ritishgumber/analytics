@@ -83,17 +83,22 @@ module.exports ={
         
         return deferred.promise;
     },
+
     updatePlanId:function(host,appId,newPlanId){
         
+        console.log("Update plan ID");
+
         var deferred= q.defer();
         
         try{
             var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace);
 
             collection.findOneAndUpdate({host:host,appId:appId}, {$set: {planId:newPlanId}}, {returnOriginal: false, upsert: true}, function(err, doc) {
-                if(err) {                
+                if(err) {
+                    console.log("Update plan Error.");                
                     deferred.reject(err);
-                }else{                
+                }else{
+                    console.log("Update plan resolve.");                
                     deferred.resolve(doc);
                 } 
             });
