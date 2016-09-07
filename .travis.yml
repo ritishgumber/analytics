@@ -44,4 +44,5 @@ after_success:
 - docker push cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER
 - docker push cloudboost/analytics:latest
 #Upload to Kubernetes for deployment.
+- kubectl cluster-info
 - kubectl rolling-update cloudboost-analytics --image=cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER
