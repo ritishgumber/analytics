@@ -44,4 +44,4 @@ after_success:
 - gcloud container clusters get-credentials $GOOGLECLUSTERNAME --zone $GOOGLEZONE --project $GOOGLEPROJECT
 #Upload to Kubernetes for deployment.
 - kubectl cluster-info
-- kubectl rolling-update cloudboost-analytics --image=cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER
+- kubectl rolling-update cloudboost-analytics --image=cloudboost/analytics:latest
