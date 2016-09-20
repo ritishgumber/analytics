@@ -164,6 +164,74 @@ module.exports = function() {
                         });
                     }else{
                         res.status(401).send("SecureKey not matched-Unauthorized");
+                    }
+                },function(error){
+                    res.status(401).send("Not a valid secureKey-Unauthorized");
+                });
+            }else{
+                res.status(400).send("AppId and Host is required");
+            }
+        }catch(err){
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
+            res.status(500).send("Error");
+        }                                
+        
+    });
+
+    //Block the app.
+    global.app.post('/app/block',function(req,res){                 
+        
+        try{    
+            var appId = req.body.appId;
+            var host = req.body.host;
+            var reason = req.body.reason;        
+            
+            if(appId && host){
+                host=host.trim();      
+                global.serverService.findKey(host).then(function(keyObj){
+
+                    if(keyObj){
+                        global.analyticsService.blockApp(host,appId,reason).then(function(resp){
+                            res.status(200).send(resp);                        
+                        },function(error){
+                            res.status(400).send(error);
+                        });
+                    }else{
+                        res.status(401).send("SecureKey not matched-Unauthorized");
+                    }                
+
+                },function(error){
+                    res.status(401).send("Not a valid secureKey-Unauthorized");
+                });
+            }else{
+                res.status(400).send("AppId and Host is required");
+            }
+        }catch(err){
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
+            res.status(500).send("Error");
+        }                                
+        
+    });
+
+    //Unblock the app.
+    global.app.post('/app/unblock',function(req,res){                 
+        
+        try{    
+            var appId = req.body.appId;
+            var host = req.body.host;      
+            
+            if(appId && host){
+                host=host.trim();      
+                global.serverService.findKey(host).then(function(keyObj){
+
+                    if(keyObj){
+                        global.analyticsService.unblock(host,appId).then(function(resp){
+                            res.status(200).send(resp);                        
+                        },function(error){
+                            res.status(400).send(error);
+                        });
+                    }else{
+                        res.status(401).send("SecureKey not matched-Unauthorized");
                     }                
 
                 },function(error){

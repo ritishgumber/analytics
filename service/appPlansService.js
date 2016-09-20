@@ -108,6 +108,31 @@ module.exports ={
         }
 
         return deferred.promise;
+    },
+
+    update: function(newAppPlanDoc){
+        console.log("Update Plan Doc");
+
+        var deferred= q.defer();
+        
+        try{
+            var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.appPlansNamespace);
+
+            collection.findOneAndUpdate({host:host,appId:appId}, {$set: newAppPlanDoc}, {returnOriginal: false, upsert: true}, function(err, doc) {
+                if(err) {
+                    console.log("Update plan Error.");                
+                    deferred.reject(err);
+                }else{
+                    console.log("Update plan resolve.");                
+                    deferred.resolve(doc);
+                } 
+            });
+        } catch(err){           
+            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
+            deferred.reject(err);
+        }
+
+        return deferred.promise;
     }
 };
 

@@ -406,6 +406,47 @@ module.exports = {
         
         return deferred.promise;
     },
+    blockApp : function(host,appId, reason){
+        var deferred= q.defer(); 
+
+        global.appPlansService.findAppPlan(host,appId).then(function(appPlanDoc){         
+            if(appPlanDoc){
+                appPlanDoc.blocked = true;
+                appPlanDoc.blockedReason = reason;
+                //save this again. 
+                global.appPlansService.update(appPlanDoc).then(function(appPlanDoc){         
+                    deferred.resolve(appPlanDoc)
+                }, function(error){
+                    deferred.reject(err);
+                });
+            }
+        }, function(error){
+            deferred.reject(err);
+        });
+
+        return deferred.promise;
+
+    },
+    unblockApp : function(host,appId, reason){
+        var deferred= q.defer(); 
+
+        global.appPlansService.findAppPlan(host,appId).then(function(appPlanDoc){         
+            if(appPlanDoc){
+                appPlanDoc.blocked = false;
+                appPlanDoc.blockedReason = null;
+                //save this again. 
+                global.appPlansService.update(appPlanDoc).then(function(appPlanDoc){         
+                    deferred.resolve(appPlanDoc)
+                }, function(error){
+                    deferred.reject(err);
+                });
+            }
+        }, function(error){
+            deferred.reject(err);
+        });
+
+        return deferred.promise;
+    },
     isAppReleased : function(host,appId){
         
         var deferred= q.defer(); 
@@ -415,37 +456,38 @@ module.exports = {
              
                 if(appPlanDoc){
 
-                    var promises=[];
+                    if(appPlanDoc.blocked){
+                        deferred.resolve({appId:appId,limitExceeded:true,message:appPlanDoc.blockedReason});
+                    }else{
+                        var promises=[];
 
-                    //API calls 
-                    promises.push(global.userMonthlyApiService.monthlyApiByAppId(appPlanDoc.host,appPlanDoc.appId,null));
-                    //Storage 
-                    promises.push(global.userStorageAnalyticsService.monthlyAnalyticsByAppId(appPlanDoc.host,appPlanDoc.appId,null));
+                        //API calls 
+                        promises.push(global.userMonthlyApiService.monthlyApiByAppId(appPlanDoc.host,appPlanDoc.appId,null));
+                        //Storage 
+                        promises.push(global.userStorageAnalyticsService.monthlyAnalyticsByAppId(appPlanDoc.host,appPlanDoc.appId,null));
 
-                    q.all(promises).then(function(list){ 
-                        var apiCalls=0;
-                        var storage=0;            
+                        q.all(promises).then(function(list){ 
+                            var apiCalls=0;
+                            var storage=0;            
 
-                        if(list[0] && list[0].monthlyApiCount){
-                            apiCalls=list[0].monthlyApiCount;
-                        }
-                        if(list[1] && list[1].totalStorage){
-                            storage=list[1].totalStorage;
-                        }
+                            if(list[0] && list[0].monthlyApiCount){
+                                apiCalls=list[0].monthlyApiCount;
+                            }
+                            if(list[1] && list[1].totalStorage){
+                                storage=list[1].totalStorage;
+                            }
 
-                        var over100Doc= _check100Percentage(appPlanDoc.appId,appPlanDoc.planId,apiCalls,storage);
-                       
-                        deferred.resolve(over100Doc);         
-                                                 
-
-                    }, function(err){    
-                        deferred.resolve({appId:appId,limitExceeded:false,message:"Error in getting usage details"});
-                    }); 
+                            var over100Doc= _check100Percentage(appPlanDoc.appId,appPlanDoc.planId,apiCalls,storage);
+                            deferred.resolve(over100Doc);         
+                        
+                        }, function(err){    
+                            deferred.resolve({appId:appId,limitExceeded:false,message:"Error in getting usage details"});
+                        }); 
+                    }
                 }else{
                     deferred.resolve({appId:appId,limitExceeded:false,message:"PlanId not found"});
                 }
                 
-
             },function(error){
                 deferred.resolve({appId:appId,limitExceeded:false,message:"Error in getting plan details"});
             });
@@ -457,8 +499,6 @@ module.exports = {
 
         return deferred.promise;
     }  
-    
-       
 };
 
 
