@@ -23,10 +23,13 @@ install:
 after_success:
 #Deploy. 
 #Docker Login
+- docker login --username $DOCKERUSERNAME --password $DOCKERPASSWORD --email $DOCKEREMAIL
+#Push docker images. 
+- docker push cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER
+- docker push cloudboost/analytics:latest
+# Make sure SDK is downloaded - cache once it's working
 - openssl aes-256-cbc -K $encrypted_244bfbacb3b9_key -iv $encrypted_244bfbacb3b9_iv -in credentials.tar.enc -out credentials.tar -d
 - tar -xvf credentials.tar
-- docker login --username $DOCKERUSERNAME --password $DOCKERPASSWORD --email $DOCKEREMAIL
-# Make sure SDK is downloaded - cache once it's working
 - curl https://sdk.cloud.google.com | bash;
 # List the SDK contents to ensure it's downloaded
 - ls -l ${HOME}/google-cloud-sdk/bin
@@ -34,14 +37,11 @@ after_success:
 - which gcloud
 # Print the gcloud version and make sure it's something
 - gcloud --version
-- ls
 #Activate Google Cloud SDK with your project
 - gcloud auth activate-service-account --key-file gc_cred.json
 #Install Kubectl
 - gcloud components install kubectl
 - gcloud container clusters get-credentials $GOOGLECLUSTERNAME --zone $GOOGLEZONE --project $GOOGLEPROJECT
-#Push docker images. 
-- docker push cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER
-- docker push cloudboost/analytics:latest
 #Upload to Kubernetes for deployment.
-- kubectl rolling-update cloudboost-analytics --image=cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER
+- kubectl config view
+- kubectl rolling-update cloudboost-analytics --image=cloudboost/analytics:latest
