@@ -14,16 +14,19 @@ if(global.config){
 global.q = require('q');
 global.keys = require('./config/keys.js')();
 
+//Init keys.
+global.keys.dbName = "_Analytics";
+global.keys.frontendServiceUrl = "https://service.cloudboost.io";
+global.keys.apiNamespace = "API";
+global.keys.userApiAnalyticsNamespace = "userApiAnalytics";
+global.keys.userMonthlyAPINamespace = "userMonthlyApi";
+global.keys.userStorageAnalyticsNamespace = "userStorageAnalytics";
+global.keys.salesNameSpace = "sales";
+global.keys.appPlansNamespace = "appPlans";
+global.keys.notificationNamespace = "notifications";
+
 if(global.isDevelopment){	
-       
-    global.keys.hostedSecureKey="1227d1c4-1385-4d5f-ae73-23e99f74b006";  
-
-    global.keys.twoCheckout.apiUser="rtbathulasuper";
-    global.keys.twoCheckout.apiPass="Harinathsir9#";
-    global.keys.twoCheckout.sellerId="901307760";
-    global.keys.twoCheckout.privateKey="4D33B4B4-6DC0-47D1-A642-436CECE51B8F";
     global.keys.twoCheckout.sandbox=true;
-
     global.keys.frontendServiceUrl="http://localhost:3000";   
 }
 
