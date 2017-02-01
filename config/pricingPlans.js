@@ -4,7 +4,7 @@ module.exports = function(){
        	id:1,
        	price:"00.00",
        	planName:"Free Plan",
-            apiCalls:10000,
+            apiCalls:5000,
             storage:0.2,
             connections:100,
             mongoDbAccess:false
@@ -43,5 +43,3 @@ module.exports = function(){
        }]
     };
 };
-
-
