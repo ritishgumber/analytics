@@ -61,21 +61,9 @@ module.exports = function () {
 
 				global.config.mongo = [];
 
-				if (process.env["MONGO_SERVICE_HOST"]) {
+				if (process.env["MONGO1_SERVICE_HOST"]) {
 					console.log("MongoDB is running on Kubernetes");
-
-					global.config.mongo.push({
-						host: process.env["MONGO_SERVICE_HOST"],
-						port: process.env["MONGO_SERVICE_PORT"]
-					});
-
-					mongoConnectionString += process.env["MONGO_SERVICE_HOST"] + ":" + process.env["MONGO_SERVICE_PORT"];
-					mongoConnectionString += ",";
-
-					var i = 2;
-
-
-
+					var i = 1;
 					while (process.env["MONGO" + i + "_SERVICE_HOST"]) {
 						global.config.mongo.push({
 							host: process.env["MONGO" + i + "_SERVICE_HOST"],
