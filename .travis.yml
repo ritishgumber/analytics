@@ -3,48 +3,48 @@ services:
 - docker
 env:
   global:
-    # Ensure the downloaded SDK is first on the PATH
-    - PATH=${HOME}/google-cloud-sdk/bin:$PATH
     # Ensure the install happens without prompts
     - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 language: node_js
 node_js:
 - '6'
 before_install:
-- npm install grunt-cli -g
-install:
-- openssl aes-256-cbc -K $encrypted_244bfbacb3b9_key -iv $encrypted_244bfbacb3b9_iv -in credentials.tar.enc -out credentials.tar -d
-- tar -xvf credentials.tar
-- mv keys.js config/keys.js
-- rm gc_cred.json
 - npm install
+install:
 - docker build -t cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER .
 - docker build -t cloudboost/analytics:latest .
+- docker run --name analytics -e  HOSTED_SECUREKEY=$HOSTED_SECUREKEY -e  LOG_TOKEN=$LOG_TOKEN -p 5555:5555 -it -d cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER 
+- sleep 30s
+- curl http://localhost:5555/status
+- docker logs analytics
+- docker logs cloudboost
 after_success:
-#Deploy. 
-#Docker Login
-- docker login --username $DOCKERUSERNAME --password $DOCKERPASSWORD --email $DOCKEREMAIL
-#Push docker images. 
-- docker push cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER
-- docker push cloudboost/analytics:latest
-# Make sure SDK is downloaded - cache once it's working
-- openssl aes-256-cbc -K $encrypted_244bfbacb3b9_key -iv $encrypted_244bfbacb3b9_iv -in credentials.tar.enc -out credentials.tar -d
-- tar -xvf credentials.tar
-- curl https://sdk.cloud.google.com | bash;
-# List the SDK contents to ensure it's downloaded
-- ls -l ${HOME}/google-cloud-sdk/bin
-# Ensure the correct gcloud is being used
-- which gcloud
-# Print the gcloud version and make sure it's something
-- gcloud --version
-#Activate Google Cloud SDK with your project
-- gcloud auth activate-service-account --key-file gc_cred.json
-#Install Kubectl
-- gcloud components install kubectl
-- gcloud container clusters get-credentials $GOOGLECLUSTERNAME --zone $GOOGLEZONE --project $GOOGLEPROJECT
-#Upload to Kubernetes for deployment.
-- kubectl config view
-- kubectl rolling-update cloudboost-analytics --image=cloudboost/analytics:latest --image-pull-policy=Always
+- echo "OK"
+before_deploy:
+  - git config --global user.email "builds@travis-ci.com"
+  - git config --global user.name "Travis CI"
+  - export GIT_TAG=2.0.$TRAVIS_BUILD_NUMBER
+  - git tag $GIT_TAG -a -m "Generated tag from TravisCI for build $TRAVIS_BUILD_NUMBER"
+  - git push -q https://$GITLOGIN@github.com/CloudBoost/analytics --tags
+  - ls -R
+deploy:
+  provider: releases
+  api_key: $GH_TOKEN
+  file: "README.md"
+  skip_cleanup: true
+  on:
+    tags: false
+    all_branches: true
+after_deploy:
+# Docker Deploy.
+- if [ "$TRAVIS_BRANCH" == "master" ]; then
+  docker login --username $DOCKERUSERNAME --password $DOCKERPASSWORD --email $DOCKEREMAIL;
+  docker push cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER;
+  docker push cloudboost/analytics:latest;
+  fi
+branches:
+  except:
+    - /^*-v[0-9]/
 #Notify Team on Slack
 notifications:
   slack: cloudboost:gm7nWJDLDtBRyF75VKLKOoMW
