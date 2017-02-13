@@ -9,15 +9,16 @@ language: node_js
 node_js:
 - '6'
 before_install:
+- docker run --name mongo -p 27017:27017 -d mongo:3.2
+- sleep 30s
 - npm install
 install:
 - docker build -t cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER .
 - docker build -t cloudboost/analytics:latest .
-- docker run --name analytics -e  HOSTED_SECUREKEY=$HOSTED_SECUREKEY -e  LOG_TOKEN=$LOG_TOKEN -p 5555:5555 -it -d cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER 
+- docker run --name analytics -e  HOSTED_SECUREKEY=$HOSTED_SECUREKEY -e  LOG_TOKEN=$LOG_TOKEN -p 5555:5555 -it --link mongo:mongo -d cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER 
 - sleep 30s
 - curl http://localhost:5555/status
 - docker logs analytics
-- docker logs cloudboost
 after_success:
 - echo "OK"
 before_deploy:
