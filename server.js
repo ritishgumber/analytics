@@ -1,7 +1,7 @@
 try{//Load the configuration.
     global.config = require('./config/cloudboost');
 }catch(e){
-    //File not found. 
+    //File not found.
     global.config = null;
 }
 
@@ -24,10 +24,11 @@ global.keys.userStorageAnalyticsNamespace = "userStorageAnalytics";
 global.keys.salesNameSpace = "sales";
 global.keys.appPlansNamespace = "appPlans";
 global.keys.notificationNamespace = "notifications";
+global.keys.clustersNamespace = "clusters";
 
-if(global.isDevelopment){	
+if(global.isDevelopment){
     global.keys.twoCheckout.sandbox=true;
-    global.keys.frontendServiceUrl="http://localhost:3000";   
+    global.keys.frontendServiceUrl="http://localhost:3000";
 }
 
 var app = require('./app')();
