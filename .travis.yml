@@ -18,7 +18,7 @@ before_install:
 install:
 - docker build -t cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER .
 - docker build -t cloudboost/analytics:latest .
-- docker run --name analytics -e  HOSTED_SECUREKEY=$HOSTED_SECUREKEY -e  LOG_TOKEN=$LOG_TOKEN -p 5555:5555 -it --link mongo:mongo -d cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER 
+- docker run --name analytics -e LOG_TOKEN='c064fc7e-4fc6-41e6-b51f-32c30deafdcc' -p 5555:5555 -it --link mongo:mongo -d cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER
 - sleep 30s
 - curl http://localhost:5555/status
 - docker logs analytics
