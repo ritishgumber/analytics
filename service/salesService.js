@@ -1,4 +1,3 @@
-global.keys.salesNamespace = "sales";
 
 module.exports ={
 
