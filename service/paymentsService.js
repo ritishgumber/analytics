@@ -74,7 +74,7 @@ module.exports ={
                 }).then(function(respData){
                     deferred.resolve(respData);
                 },function(error){
-                   console.log(error);
+                    console.log(error);
                     deferred.reject(error);
                 });
             }else{
@@ -82,7 +82,7 @@ module.exports ={
                     error:"Billing Details are not valid or missed",
                     field:errorMsg
                 };
-                console.log(errorObj);
+                console.log(JSON.stringify(errorObj));
                 deferred.reject(errorObj);
             }
 
