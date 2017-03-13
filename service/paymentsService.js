@@ -4,11 +4,11 @@ var pricingPlans = require('../config/pricingPlans.js')();
 module.exports ={
 
     createThirdPartySale : function(appId,data){
-        
+
         var _self = this;
 
-        var deferred= q.defer();   
-        
+        var deferred= q.defer();
+
         try{
             var selectedPlan=_.first(_.where(pricingPlans.plans, {id: data.planId}));
 
@@ -19,34 +19,33 @@ module.exports ={
             }, function(error){
                 deferrd.reject(error);
             });
-            
-        } catch(err){           
+
+        } catch(err){
             global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             deferred.reject(err);
         }
 
-        return deferred.promise; 
+        return deferred.promise;
     },
 
 
     createSale : function(appId,data){
-        
+
         var _self = this;
 
-        var deferred= q.defer();            
-        
+        var deferred= q.defer();
+
         try{
             var selectedPlan=_.first(_.where(pricingPlans.plans, {id: data.planId}));
 
             var errorMsg=_validateBillingDetails(data.billingAddr);
-
 
             if(!errorMsg){
                 _self.stopRecurring(data.secureKey,appId,data.userId).then(function(recurringDoc){//Remove previous plan first
 
                     return global.twoCheckoutService.createSale(data,selectedPlan);//create sale
 
-                }).then(function(saleDocument){              
+                }).then(function(saleDocument){
 
                     if(saleDocument && saleDocument.response){
 
@@ -61,8 +60,8 @@ module.exports ={
                             total:saleDocument.response.total,
                             responseMsg:saleDocument.response.responseMsg,
                             saleTimestamp: new Date().getTime()
-                        };                  
-                        
+                        };
+
                         global.appPlansService.updatePlanId(data.secureKey,appId,selectedPlan.id);//update appPlan
                         return global.salesService.saveSale(saveSaleObj);//add document for records
 
@@ -71,11 +70,11 @@ module.exports ={
                         failedRespDeffred.reject("Failed to Purchase..Try again");
                         return failedRespDeffred.promise;
                     }
-                    
 
-                }).then(function(respData){                     
+                }).then(function(respData){
                     deferred.resolve(respData);
                 },function(error){
+                   console.log(error);
                     deferred.reject(error);
                 });
             }else{
@@ -83,25 +82,27 @@ module.exports ={
                     error:"Billing Details are not valid or missed",
                     field:errorMsg
                 };
+                console.log(errorObj);
                 deferred.reject(errorObj);
             }
 
-        } catch(err){           
+        } catch(err){
+            console.log(err);
             global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             deferred.reject(err);
         }
 
-        return deferred.promise; 
+        return deferred.promise;
     },
 
     stopRecurring : function(host,appId,userId){
-        
+
         var _self = this;
 
-        var deferred= q.defer();        
+        var deferred= q.defer();
 
         try{
-            global.salesService.getLatestSale(appId,userId).then(function(saleDocument){           
+            global.salesService.getLatestSale(appId,userId).then(function(saleDocument){
                 if(saleDocument){
                     return global.twoCheckoutService.getSaleDetailsByInvoiceId(saleDocument.invoiceId);
                 }else{
@@ -109,7 +110,7 @@ module.exports ={
                     nosaleDocDeffred.resolve(null);
                     return nosaleDocDeffred.promise;
                 }
-            }).then(function(saleDetails){            
+            }).then(function(saleDetails){
                 if(saleDetails){
 
                     //Sort in DESC order
@@ -117,7 +118,7 @@ module.exports ={
                         var c = new Date(a.date_placed);
                         var d = new Date(b.date_placed);
                         return d-c;
-                    });                
+                    });
 
                     return global.twoCheckoutService.stopRecurring(saleDetails.sale.invoices[0].lineitems[0].lineitem_id);
                 }else{
@@ -125,29 +126,29 @@ module.exports ={
                     noSaleDetDeffred.resolve(null);
                     return noSaleDetDeffred.promise;
                 }
-            }).then(function(data){ 
+            }).then(function(data){
 
                 var planId=1;//make it to 1
-                return global.appPlansService.updatePlanId(host,appId,planId);//update appPlan with first plan          
-                
+                return global.appPlansService.updatePlanId(host,appId,planId);//update appPlan with first plan
+
             }).then(function(updatedPlan){
                 deferred.resolve({message:"success"});
-            },function(error){ 
+            },function(error){
                 if(error && error.message && error.message=="Lineitem is not scheduled to recur."){
                     deferred.resolve({message:"Lineitem is not scheduled to recur."});
                 }else{
                     deferred.reject(error);
-                }           
-                
+                }
+
             });
 
-        } catch(err){           
+        } catch(err){
             global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             deferred.reject(err);
         }
 
-        return deferred.promise; 
-    },        
+        return deferred.promise;
+    },
 };
 
 function _validateBillingDetails(billing){
@@ -197,7 +198,7 @@ function _validateBillingDetails(billing){
     }
 
     return errorMsg;
-}  
+}
 
 function fieldsRequiredForCountries(country){
     country=country.trim();
