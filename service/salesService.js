@@ -1,53 +1,54 @@
+global.keys.salesNamespace = "sales";
+
 module.exports ={
 
-   
+
     saveSale : function(saleDocument){
-        
+
         var deferred= q.defer();
-        
+
         try{
-            var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.salesNamespace);      
-                
+            var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.salesNamespace);
+
             collection.save(saleDocument,function(err,doc){
-                if(err) {               
+                if(err) {
                     deferred.reject(err);
-                }else{                             
-                    deferred.resolve(doc.ops[0]);                              
+                }else{
+                    deferred.resolve(doc.ops[0]);
                 }
             });
 
-        } catch(err){           
+        } catch(err){
             global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             deferred.reject(err);
         }
-       
-        return deferred.promise; 
+
+        return deferred.promise;
     },
 
     getLatestSale : function(appId,userId){
-        
+
         var deferred= q.defer();
-        
+
         try{
-            
-            var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.salesNamespace);         
+
+            var collection =  global.mongoClient.db(global.keys.dbName).collection(global.keys.salesNamespace);
 
             collection.find({appId:appId,userId:userId}).sort({saleTimestamp:-1}).toArray(function(err,docs){
-                if(err) {                
+                if(err) {
                     deferred.reject(err);
-                }else{                
+                }else{
                     deferred.resolve(docs[0]);
                 }
             });
 
-        } catch(err){           
-            global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
+        } catch(err){
+            glroobal.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             deferred.reject(err);
         }
-       
-        return deferred.promise; 
+
+        return deferred.promise;
     },
 
 
 };
-
