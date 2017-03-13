@@ -5,12 +5,12 @@ module.exports = function() {
     global.app.post('/server/register',function(req,res){
 
         try{
-        	var data = req.body || {};                 
+        	var data = req.body || {};
 
             if(data.secureKey){
                 global.serverService.registerCluster(data.secureKey).then(function(result){
                    return res.status(200).json(result);
-                }, function(error){           
+                }, function(error){
                     return res.status(400).send(error);
                 });
             }else{
@@ -28,7 +28,7 @@ module.exports = function() {
     global.app.post('/server/isHosted',function(req,res){
 
         try{
-            var data = req.body || {}; 
+            var data = req.body || {};
 
             if(data.secureKey){
 
@@ -40,11 +40,11 @@ module.exports = function() {
 
             }else{
                 return res.send(400, "Bad Request");
-            } 
+            }
         }catch(err){
             global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
             res.status(500).send("Error");
-        }       
+        }
 
     });
 
@@ -52,14 +52,13 @@ module.exports = function() {
 
         console.log("MongoDb Status..");
 
-        global.serverService.getDBStatuses().then(function(response){           
-            return res.status(200).json({status:200, message : "Service Status : OK"});            
+        global.serverService.getDBStatuses().then(function(response){
+            return res.status(200).json({status:200, message : "Service Status : OK"});
         },function(error){
             return res.status(500).send("Something went wrong!");
         });
-                  
+
     });
 
-    
-};
 
+};
