@@ -11,7 +11,6 @@ CloudBoost is the Complete NoSQL Database Service for your app. **Think of Cloud
  - Queues
  - More - ACL's, User Authentication, Server-less apps and more. 
 
-
 #CloudBoost Analytics
 
 This is a CloudBoost Analytics Microservice that powers [CloudBoost Dashboard](https://www.github.com/CloudBoost/dashboard) and [CloudBoost Engine](https://www.github.com/CloudBoost/cloudboost).
