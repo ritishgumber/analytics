@@ -10,8 +10,8 @@ module.exports = function () {
 
 	global.app = express();
 	global.app.use('/', express.static(__dirname + '/public'));
-	global.app.use(bodyParser.urlencoded({ extended: true }));
-	global.app.use(bodyParser.json());
+	global.app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
+	global.app.use(bodyParser.json({ limit: '50mb' }));
 	require('./config/cors.js')(); //cors
 
 	global.winston.add(global.winston.transports.Loggly, {
