@@ -17,13 +17,27 @@ before_install:
 - npm install
 install:
 - docker build -t cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER .
-- docker build -t cloudboost/analytics:latest .
 - docker run --name analytics -e LOG_TOKEN='c064fc7e-4fc6-41e6-b51f-32c30deafdcc' -p 5555:5555 -it --link mongo:mongo -d cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER
 - sleep 30s
 - curl http://localhost:5555/status
-- docker logs analytics
 after_success:
-- echo "OK"
+# Build Docker Images
+- if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker build -t cloudboost/analytics:latest .;
+  fi
+# Docker Deploy for staging builds
+- if [ "$TRAVIS_BRANCH" == "staging" ]; then
+    docker build -t cloudboost/analytics:staging .;
+    docker login --username $DOCKERUSERNAME --password $DOCKERPASSWORD --email $DOCKEREMAIL;
+    docker push cloudboost/analytics:staging;
+    git clone https://github.com/CloudBoost/kube-cred.git;
+    cd kube-cred;
+    openssl enc -in config.enc -out config -d -aes256 -k $KUBE_ENC;
+    mkdir ~/.kube;
+    mv config ~/.kube/;
+    kubectl rolling-update cloudboost-analytics-staging --image=cloudboost/analytics:staging --image-pull-policy=Always;
+    curl -X DELETE "https://api.cloudflare.com/client/v4/zones/""$cloudflare_zone""/purge_cache" -H "X-Auth-Email:hello@cloudboost.io" -H "X-Auth-Key:""$cloud_flare_key" -H "Content-Type:application/json" --data "{'purge_everything':true}";
+  fi
 before_deploy:
   - git config --global user.email "builds@travis-ci.com"
   - git config --global user.name "Travis CI"
@@ -37,7 +51,7 @@ deploy:
   skip_cleanup: true
   on:
     tags: false
-    all_branches: true
+    branch: master
 after_deploy:
 # Docker Deploy.
 - if [ "$TRAVIS_BRANCH" == "master" ]; then
