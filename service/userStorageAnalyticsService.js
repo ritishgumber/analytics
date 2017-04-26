@@ -88,12 +88,18 @@ module.exports ={
             collection.find({host:host,appId:appId,timeStamp: {"$gte": fromTime}}).toArray(function(err,docs){
                 if(err) {                               
                     deferred.reject(err);
-                }else if(docs && docs.length>0){
-                    deferred.resolve(_prepareResponse(docs));                 
-                }else{
+                } else if(docs && docs.length>0) {
+                    this.lastRecordByAppId(host,appId).then(function(data){
+                        var responseData = _prepareResponse(docs)
+                        responseData.totalStorage = data.size || 0
+                        deferred.resolve(responseData);
+                    },function(err){
+                        deferred.resolve(null);
+                    })             
+                } else {
                     deferred.resolve(null);
                 }
-            });
+            }.bind(this));
 
         } catch(err){           
           global.winston.log('error',{"error":String(err),"stack": new Error().stack}) ;
@@ -240,14 +246,11 @@ module.exports ={
 
 function _prepareResponse(dayCountList) {
     
-    var totalStorage=0;
     for(var i=0;i<dayCountList.length;++i){
-        totalStorage=totalStorage+parseFloat(dayCountList[i].size);
         delete dayCountList[i].host;
     }  
    
     var response={                     
-        totalStorage:totalStorage,
         usage: dayCountList       
     };
 
