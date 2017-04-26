@@ -44,7 +44,7 @@ module.exports = {
                         },function(error){
                             console.log("App Check Limit error");
                             console.log(error);
-                            
+
                             deferred.resolve({appId:appId,limitExceeded:false,message:"Error in computing whole process"});
                         }); 
                     }else{
@@ -478,6 +478,7 @@ module.exports = {
                             }
 
                             var over100Doc= _check100Percentage(appPlanDoc.appId,appPlanDoc.planId,apiCalls,storage);
+                            console.log("+++ isApprelease promises +++",over100Doc)
                             deferred.resolve(over100Doc);         
                         
                         }, function(err){    
@@ -565,6 +566,7 @@ function _check100Percentage(appId,planId,apiCalls,storage){
         
         if(apiCalls!=0){       
             if(apiCalls>currentPlan.apiCalls){
+                console.log("+++ check100Percent API +++",apiCalls,currentPlan.apiCalls)
                 return {appId:appId,limitExceeded:true,message:"API Calls limit exceeded "+currentPlan.apiCalls+" for "+currentPlan.planName};
             }
         }    
@@ -572,6 +574,7 @@ function _check100Percentage(appId,planId,apiCalls,storage){
         if(storage!=0){
             storage=(storage/1024);
             if(storage>currentPlan.storage){
+                console.log("+++ check100Percent STORAGE +++",storage,currentPlan.storage)
                 return {appId:appId,limitExceeded:true,message:"Storage limit exceeded "+currentPlan.storage+"(GB) for "+currentPlan.planName};
             }
         } 
