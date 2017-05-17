@@ -17,7 +17,7 @@ before_install:
 - npm install
 install:
 - docker build -t cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER .
-- docker run --name analytics -e LOG_TOKEN='c064fc7e-4fc6-41e6-b51f-32c30deafdcc' -p 5555:5555 -it --link mongo:mongo -d cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER
+- docker run --name analytics -e HOSTED_SECUREKEY='1227d1c4-1385-4d5f-ae73-23e99f74b006' -e LOG_TOKEN='c064fc7e-4fc6-41e6-b51f-32c30deafdcc' -p 5555:5555 -it --link mongo:mongo -d cloudboost/analytics:2.0.$TRAVIS_BUILD_NUMBER
 - sleep 30s
 - curl http://localhost:5555/status
 after_success:
