@@ -1,0 +1,49 @@
+machine:
+  node:
+    version: 7.4.0
+  services:
+    - docker
+  environment:
+    CLOUDSDK_CORE_DISABLE_PROMPTS: 1
+dependencies:
+  override:
+    - sudo apt-get update
+    - sudo apt-get install curl libc6 libcurl3 zlib1g
+    - npm install
+  post:
+    - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+    - chmod +x ./kubectl
+    - sudo mv ./kubectl /usr/local/bin/kubectl
+test:
+  pre:
+    - docker run --name mongo -p 27017:27017 -d mongo:3.2
+    - docker build -t cloudboost/analytics:3.0.$CIRCLE_BUILD_NUM .
+    - docker run --name analytics -e HOSTED_SECUREKEY='1227d1c4-1385-4d5f-ae73-23e99f74b006' -e LOG_TOKEN='c064fc7e-4fc6-41e6-b51f-32c30deafdcc' -p 5555:5555 -it --link mongo:mongo -d cloudboost/analytics:3.0.$CIRCLE_BUILD_NUM
+    - sleep 30s
+  override:
+    - curl http://localhost:5555/status
+deployment:
+  staging:
+    branch: staging
+    commands:
+      - docker build -t cloudboost/analytics:staging .
+      - docker login --username $DOCKERUSERNAME --password $DOCKERPASSWORD --email $DOCKEREMAIL
+      - docker push cloudboost/analytics:3.0.$CIRCLE_BUILD_NUM
+      - docker push cloudboost/analytics:staging
+      - git clone https://github.com/CloudBoost/kube-cred.git
+      - cd kube-cred && openssl enc -in config.enc -out config -d -aes256 -k $KUBE_ENC
+      - mkdir ~/.kube
+      - cd kube-cred && mv config ~/.kube/
+      - kubectl rolling-update cloudboost-analytics-staging --image=cloudboost/analytics:staging --image-pull-policy=Always
+  production:
+    branch: master
+    commands:
+      - docker build -t cloudboost/analytics:latest .
+      - docker login --username $DOCKERUSERNAME --password $DOCKERPASSWORD --email $DOCKEREMAIL
+      - docker push cloudboost/analytics:3.0.$CIRCLE_BUILD_NUM
+      - docker push cloudboost/analytics:latest
+      - git clone https://github.com/CloudBoost/kube-cred.git
+      - cd kube-cred && openssl enc -in config.enc -out config -d -aes256 -k $KUBE_ENC
+      - mkdir ~/.kube
+      - cd kube-cred && mv config ~/.kube/
+      - kubectl rolling-update cloudboost-analytics --image=cloudboost/analytics:latest --image-pull-policy=Always
