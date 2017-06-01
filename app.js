@@ -28,8 +28,8 @@ module.exports = function () {
 
 			console.log("Looking for a MongoDB Cluster...");
 
-			if ((!global.config && !process.env["MONGO_1_PORT_27017_TCP_ADDR"] && !process.env["MONGO_SERVICE_HOST"]) || (!global.config && !process.env["MONGO_PORT_27017_TCP_ADDR"] && !process.env["MONGO_SERVICE_HOST"])) {
-				console.error("INFO : Not running on Docker. Use docker-compose (recommended) from https://github.com/cloudboost/docker");
+			if (process.env["CLOUDBOOST_MONGODB_USERNAME"] && process.env["CLOUDBOOST_MONGODB_PASSWORD"]) {
+				mongoConnectionString += process.env["CLOUDBOOST_MONGODB_USERNAME"] + ":" + process.env["CLOUDBOOST_MONGODB_PASSWORD"] + "@";
 			}
 
 			var mongoConnectionString = "mongodb://";
@@ -61,19 +61,17 @@ module.exports = function () {
 
 				global.config.mongo = [];
 
-				if (process.env["MONGO1_SERVICE_HOST"]) {
+				if (process.env["KUBERNETES_STATEFUL_MONGO_URL"]) {
 					console.log("MongoDB is running on Kubernetes");
-					var i = 1;
-					while (process.env["MONGO" + i + "_SERVICE_HOST"]) {
-						global.config.mongo.push({
-							host: process.env["MONGO" + i + "_SERVICE_HOST"],
-							port: process.env["MONGO" + i + "_SERVICE_PORT"]
-						});
-						mongoConnectionString += process.env["MONGO" + i + "_SERVICE_HOST"] + ":" + process.env["MONGO" + i + "_SERVICE_PORT"];
-						mongoConnectionString += ",";
-						++i;
-					}
-
+					
+					global.config.mongo = process.env["KUBERNETES_STATEFUL_MONGO_URL"].split(',').map(function(x,i){
+						return {
+							host:x.split(':')[0],
+							port:x.split(':')[1]
+						}
+					})
+			
+					mongoConnectionString += process.env["KUBERNETES_STATEFUL_MONGO_URL"]
 					isReplicaSet = true;
 
 				} else {
