@@ -5,6 +5,8 @@ var CronJob = require('cron').CronJob;
 global.winston = require('winston');
 require('winston-loggly');
 var expressWinston = require('express-winston');
+var slack = require('winston-bishop-slack').Slack;
+var util = require('util');
 
 module.exports = function () {
 
@@ -20,6 +22,31 @@ module.exports = function () {
 		tags: ["analytics-server"],
 		json: true
 	});
+
+	// add slack transport if API key found
+	if(global.keys.slackWebHook){
+		var envVal = process.env["IS_STAGING"] ? 'STAGING' : 'PRODUCTION'
+		global.winston.add(slack, {
+			webhook_url: global.keys.slackWebHook,
+			icon_url: "https://cdn2.iconfinder.com/data/icons/circle-icons-1/64/caution-128.png",
+			channel: "#devlogs",
+			username: "Cluster-Analytics ERROR BOT - " + envVal,
+			level: 'error',
+			handleExceptions: true,
+			customFormatter: function(level, message, meta) {
+				return { attachments: [ {
+				fallback: "An Error occured on Cluster-Analytics POD in - " + envVal,
+				pretext: "An Error occured on Cluster-Analytics POD in - " + envVal,
+				color: '#D00000',
+				fields: [{
+						title: util.format(":scream_cat: %s", 'Critical Error'),
+						value: meta.error,
+						short: false
+					}]
+				}]}
+			}
+		})
+	}
 
 	function setUpMongoDB() {
 		//MongoDB connections.

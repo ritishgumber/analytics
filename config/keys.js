@@ -8,6 +8,7 @@ module.exports = function(){
         sellerId:process.env['TC_SELLER_ID'],
         privateKey:process.env['TC_PRIVATE_KEY'],
         sandbox:false
-       }
+       },
+       slackWebHook : process.env['SLACK_WEBHOOK']
     };
 };
