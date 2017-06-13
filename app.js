@@ -30,7 +30,7 @@ module.exports = function () {
 			webhook_url: global.keys.slackWebHook,
 			icon_url: "https://cdn2.iconfinder.com/data/icons/circle-icons-1/64/caution-128.png",
 			channel: "#devlogs",
-			username: "Cluster-Analytics ERROR BOT - " + envVal,
+			username: "Cluster-Analytics ERROR - " + envVal,
 			level: 'error',
 			handleExceptions: true,
 			customFormatter: function(level, message, meta) {
@@ -39,8 +39,8 @@ module.exports = function () {
 				pretext: "An Error occured on Cluster-Analytics POD in - " + envVal,
 				color: '#D00000',
 				fields: [{
-						title: util.format(":scream_cat: %s", 'Critical Error'),
-						value: meta.error,
+						title: meta.error,
+						value: meta.stack,
 						short: false
 					}]
 				}]}
