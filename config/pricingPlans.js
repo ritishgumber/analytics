@@ -4,7 +4,7 @@ module.exports = function(){
        	id:1,
        	price:"00.00",
        	planName:"Free Plan",
-            apiCalls:5000,
+            apiCalls:2500,
             storage:0.2,
             connections:100,
             mongoDbAccess:false
